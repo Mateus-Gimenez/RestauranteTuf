@@ -1,6 +1,6 @@
 ﻿@inject IJSRuntime Js;
 @inject DialogService DialogService;
-@inject GuardFood.Core.Data.Interfaces.IProdutoRepository IProdutoRepository;
+@inject IServiceScopeFactory ScopeFactory;
 
 <RadzenTemplateForm TItem="Produto" Data=@produto Submit=@OnSubmit>
     <RadzenFieldset Text="Dados Produto">
@@ -56,13 +56,17 @@
     {
         //using var dbContext = DbFactory.CreateDbContext();
 
-        var retorno = IProdutoRepository.InserirEditar(produto);
-
-        //await Js.InvokeVoidAsync("notifica", retorno.Sucesso ? "" : "Erro", retorno.Mensagem, retorno.Sucesso);
-        if (retorno.Sucesso)
+        using (var scope = ScopeFactory.CreateScope())
         {
-            DialogService.Close();
-            await dataGridProduto.Reset();
+            var retorno = scope.ServiceProvider.GetRequiredService<IProdutoRepository>().InserirEditar(produto);
+
+            //await Js.InvokeVoidAsync("notifica", retorno.Sucesso ? "" : "Erro", retorno.Mensagem, retorno.Sucesso);
+            if (retorno.Sucesso)
+            {
+                DialogService.Close();
+                await dataGridProduto.Reset();
+            }
         }
+
     }
 }
