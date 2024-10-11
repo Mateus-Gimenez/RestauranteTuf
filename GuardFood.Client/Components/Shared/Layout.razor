@@ -1,0 +1,112 @@
+﻿@inject IJSRuntime Js;
+@inject DialogService DialogService;
+
+<style>
+    .rz-header {
+        min-height: 50px !important;
+    }
+
+        .rz-header, .rz-sidebar, .rz-header .rz-sidebar-toggle, .rz-sidebar .rz-panel-menu, .rz-header .rz-profile-menu, .rz-header .rz-navigation-menu, .rz-header .rz-label, .rz-header .rz-navigation-item-link, .rz-header .rz-navigation-item-text {
+            background-color: #041a1b !important;
+            color: #f6f7fa !important;
+        }
+
+            .rz-sidebar .rz-navigation-item-icon, .rz-sidebar .rz-panel-menu .rz-navigation-item-wrapper:hover {
+                color: #f6f7fa !important;
+            }
+
+    .rz-sidebar {
+        z-index: 999 !important;
+    }
+</style>
+
+<RadzenComponents />
+
+<RadzenLayout>
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+            </RadzenStack>
+            <RadzenStack>
+                <RadzenProfileMenu>
+                    <Template>
+                        <RadzenLabel Text="@(usuario?.UserName)" Style="margin-right: 0.5rem" />
+                        <RadzenGravatar Email="@(usuario?.Email)" />
+                    </Template>
+                    <ChildContent>
+                        @*<RadzenProfileMenuItem Text="Ver Perfil" Path="menu" Icon="account_circle"></RadzenProfileMenuItem>*@
+                        <div @onclick="exibePopupTrocaSenha">
+                            <RadzenProfileMenuItem Text="Trocar Senha" Icon="lock_reset"></RadzenProfileMenuItem>
+                        </div>
+                        <div @onclick="temaClaro">
+                            <RadzenProfileMenuItem Visible="!LightMode" Text="Modo Claro" Icon="light_mode"></RadzenProfileMenuItem>
+                        </div>
+                        <div @onclick="temaEscuro">
+                            <RadzenProfileMenuItem Visible="LightMode" Text="Modo Escuro" Icon="dark_mode" @onclick="temaEscuro"></RadzenProfileMenuItem>
+                        </div>
+                        <div onclick="sairSistema()">
+                            <RadzenProfileMenuItem Text="Sair" Icon="logout"></RadzenProfileMenuItem>
+                        </div>
+                    </ChildContent>
+                </RadzenProfileMenu>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenSidebar @bind-Expanded="@sidebarExpanded" Responsive="true">
+        <RadzenPanelMenu>
+            <RadzenPanelMenuItem Text="Home" Icon="home" Path="/" />
+            <RadzenPanelMenuItem Text="Produtos" Icon="inventory_2" Path="/Produto" />
+            <RadzenPanelMenuItem Text="Pedidos" Icon="receipt_long" Path="/Pedido" />
+            <RadzenPanelMenuItem Text="Usuários" Icon="account_box" Path="/Usuario" />
+        </RadzenPanelMenu>
+    </RadzenSidebar>
+    <RadzenBody>
+        <div id="corpo-principal" class="rz-p-4">
+        </div>
+    </RadzenBody>
+</RadzenLayout>
+
+@code {
+
+    [Parameter]
+    public Usuario usuario { get; set; } = new Usuario();
+
+    [Parameter]
+    public bool LightMode { get; set; }
+
+    bool sidebarExpanded = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("insereBody");
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    async void temaClaro()
+    {
+        LightMode = true;
+        await Js.InvokeVoidAsync("temaClaro");
+    }
+
+    async void temaEscuro()
+    {
+        LightMode = false;
+        await Js.InvokeVoidAsync("temaEscuro");
+    }
+
+    async void exibePopupTrocaSenha()
+    {
+        //await DialogService.OpenAsync<>("Trocar Senha", null, new DialogOptions() { Width = "400px", Height = "auto", Resizable = true, Draggable = true });
+    }
+
+    async void redirecionaTela(string detalhe)
+    {
+        await Js.InvokeVoidAsync("redirecionaTela", detalhe);
+    }
+
+    async void sairSistema()
+    {
+        await Js.InvokeVoidAsync("sairSistema");
+    }
+}

@@ -1,0 +1,62 @@
+﻿@page "/Login"
+@model GuardFood.Console.Pages.Autenticacao.LoginModel
+@inject Microsoft.EntityFrameworkCore.IDbContextFactory<GFContext> DbFactory;
+@inject Microsoft.AspNetCore.Identity.UserManager<Usuario> UserManager;
+@inject Microsoft.AspNetCore.Identity.SignInManager<Usuario> SignInManager;
+@namespace GuardFood.Console.Pages.Autenticacao
+@functions {
+    async Task<IActionResult> OnLogin(LoginArgs args)
+    {
+        using var dbContext = DbFactory.CreateDbContext();
+
+        var usuario = dbContext.Usuarios.FirstOrDefault(f => f.UserName == args.Username);
+
+        var teste = await SignInManager.CheckPasswordSignInAsync(usuario, args.Password, false);
+        var result = await SignInManager.PasswordSignInAsync(args.Username, args.Password, args.RememberMe, false);
+        if (result.Succeeded)
+        {
+            return Redirect("/");
+        }
+        else
+        {
+            return BadRequest("Erro");
+        }
+    }
+}
+@{
+    Layout = "";
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+    <title>Login :: GuardFood</title>
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <component type="typeof(RadzenTheme)" render-mode="ServerPrerendered" param-Theme="@("material")" />
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
+
+    <style>
+        body {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rz-label {
+            color: var(--rz-text-color);
+        }
+    </style>
+
+</head>
+<body>
+    <component type="typeof(GuardFood.Console.Pages.Autenticacao.Login)" render-mode="ServerPrerendered" />
+
+    <script src="_framework/blazor.server.js"></script>
+</body>
+</html>

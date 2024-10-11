@@ -1,0 +1,38 @@
+﻿@inject IJSRuntime JsRuntime;
+@inject HttpClient httpClient;
+@inject NotificationService notificationService;
+
+<style>
+    .rz-login-buttons .rz-button {
+        width: 100%;
+    }
+</style>
+
+<RadzenComponents />
+
+<RadzenCard class="rz-my-12 rz-mx-auto rz-p-4 rz-p-md-12" style="max-width: 600px; margin-left: 3rem; margin-right: 3rem">
+    <div style="width: 100%; display:flex; justify-content: center">
+    </div>
+    <RadzenLogin AllowRegister="false" AllowResetPassword="false" UserText="Login" PasswordText="Senha" RememberMeText="Lembrar" AllowRememberMe="true" RememberMe="false" Login=@(args => OnLogin(args)) />
+</RadzenCard>
+
+@code {
+
+    async void OnLogin(LoginArgs args)
+    {
+        var retorno = await JsRuntime.InvokeAsync<RetornoViewModel>("realizaLogin", new AutenticacaoViewModel()
+        {
+            Usuario = args.Username,
+            Senha = args.Password,
+            Lembrar = args.RememberMe,
+        });
+        if (retorno.Sucesso)
+        {
+            await JsRuntime.InvokeVoidAsync("redirecionaHome");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("notifica", "Erro:", retorno.Mensagem, false);
+        }
+    }
+}

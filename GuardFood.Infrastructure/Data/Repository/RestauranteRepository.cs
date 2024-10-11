@@ -1,14 +1,14 @@
 ﻿using GuardFood.Core.Entities;
-using GuardFood.Infrastructure.Data.Interfaces;
+using GuardFood.Core.Data.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GuardFood.Infrastructure.Context;
+using GuardFood.Core.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace GuardFood.Infrastructure.Data.Repository
+namespace GuardFood.Core.Data.Repository
 {
     public class RestauranteRepository : Repository<Restaurante>, IRestauranteRepository
     {

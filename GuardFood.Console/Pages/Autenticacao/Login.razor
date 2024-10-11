@@ -1,0 +1,54 @@
+﻿@inject Microsoft.AspNetCore.Identity.UserManager<Usuario> UserManager;
+@inject Microsoft.AspNetCore.Identity.SignInManager<Usuario> SignInManager;
+@inject Microsoft.EntityFrameworkCore.IDbContextFactory<GFContext> DbFactory;
+@inject NavigationManager Navigation;
+
+<RadzenCard class="rz-my-12 rz-mx-auto rz-p-4 rz-p-md-12" style="max-width: 600px; margin-left: 3rem; margin-right: 3rem">
+    <RadzenLogin AllowRegister="false" AllowResetPassword="false" UserText="Login" PasswordText="Senha" RememberMeText="Lembrar" AllowRememberMe="true" RememberMe="false" Login=@(args => OnLogin(args)) />
+</RadzenCard>
+
+@code {
+
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    [Parameter]
+    public string ReturnUrl { get; set; } = "/";
+
+    protected async override Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        using var dbContext = DbFactory.CreateDbContext();
+
+        if (!dbContext.Usuarios.Any())
+        {
+            var usuarioMaster = new Usuario()
+            {
+                UserName = "master",
+                Nome = "Master",
+                Email = "master@gmail.com",
+                PhoneNumber = "1234567890",
+            };
+            await UserManager.CreateAsync(usuarioMaster, "Master@2024");
+        }
+    }
+
+    void OnLogin(LoginArgs args)
+    {
+        using var dbContext = DbFactory.CreateDbContext();
+
+        var usuario = dbContext.Usuarios.FirstOrDefault(f => f.UserName == args.Username);
+        //HttpContext.SignInAsync().
+        var teste = SignInManager.CheckPasswordSignInAsync(usuario, args.Password, false).Result;
+        var result = SignInManager.PasswordSignInAsync(args.Username, args.Password, args.RememberMe, false).Result;
+        if (result.Succeeded)
+        {
+            Navigation.NavigateTo(ReturnUrl ?? "/");
+        }
+        else
+        {
+            return;
+            // Tratar erro de login
+        }
+    }
+}

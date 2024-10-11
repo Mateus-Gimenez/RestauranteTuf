@@ -1,0 +1,104 @@
+﻿@using System.Linq.Dynamic.Core;
+@inject IJSRuntime JsRuntime;
+@inject DialogService DialogService;
+@inject IProdutoRepository IProdutoRepository;
+@inject IDbContextFactory<GFContext> DbFactory;
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+    <RadzenLabel><h4>Produtos</h4></RadzenLabel>
+    <RadzenBreadCrumb>
+        <RadzenBreadCrumbItem Path="/" Text="Home" Icon="home" />
+        <RadzenBreadCrumbItem Text="Produtos" Icon="inventory_2" />
+    </RadzenBreadCrumb>
+</RadzenStack>
+
+<RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="true" FilterMode="FilterMode.Simple" AllowSorting="true" EmptyText="Nenhum Registro Encontrado!"
+                IsLoading=@isLoading LoadData="@LoadData" Count="@count" Data="@produtos" TItem="Produto" ColumnWidth="300px" Responsive="true" LogicalFilterOperator="LogicalFilterOperator.And" Style="margin-top: 1.5rem; max-height: calc(100vh - 13rem)">
+    <HeaderTemplate>
+        <RadzenButton Text="Adicionar Produto" Click=@(() => ExibePopupProduto()) />
+    </HeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn TItem="Produto" Context="Id" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" Width="100px">
+            <Template Context="Id">
+                <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="edit" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="(args => ExibePopupEditarProduto(Id))" title="Editar" />
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Click="(args => Delete(Id))" class="my-1 ms-1" title="Remover" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Produto" Property="Nome" Title="Nome" Filterable="true" Sortable="true" FilterOperator="FilterOperator.StartsWith">
+            <FooterTemplate>
+                <b>@count</b> Registros
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Produto" Property="Descricao" Title="Descrição" />
+        <RadzenDataGridColumn TItem="Produto" Property="ValorMonetario" Title="Valor" />
+        <RadzenDataGridColumn TItem="Produto" Property="Inclusao" Title="Dt. Inclusão" SortOrder="SortOrder.Descending" />
+        <RadzenDataGridColumn TItem="Produto" Property="Alteracao" Title="Dt. Alteração" />
+    </Columns>
+</RadzenDataGrid>
+
+@code
+{
+    RadzenDataGrid<Produto> grid;
+    IEnumerable<Produto> produtos;
+    int count;
+    bool isLoading = false;
+
+    async void ExibePopupProduto()
+    {
+        await DialogService.OpenAsync<PopupProduto>("Adicionar Produto", new Dictionary<string, object>() { { "dataGridProduto", this } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
+    }
+
+    async Task ExibePopupEditarProduto(Produto produto)
+    {
+        await DialogService.OpenAsync<PopupProduto>("Editar Produto", new Dictionary<string, object>() { { "dataGridProduto", this }, { "editar", true }, { "Produto", produto } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
+    }
+
+    public async Task Reset()
+    {
+        grid.Reset(true);
+        await grid.FirstPage(true);
+    }
+
+    async Task Delete(Produto produto)
+    {
+        var popupConfirma = await DialogService.Confirm($"Deseja mesmo deletar o produto {produto.Nome}?", "Deletar Produto", new ConfirmOptions() { OkButtonText = "Sim", CancelButtonText = "Não" });
+        if (popupConfirma == true)
+        {
+            IProdutoRepository.Deletar(produto.Id);
+            await Reset();
+        }
+    }
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        await Task.Yield();
+
+        using var dbContext = DbFactory.CreateDbContext();
+
+        var query = dbContext.Produto.Where(w => w.Ativo).AsEnumerable();
+
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.AsQueryable().Where(args.Filter).AsEnumerable();
+        }
+
+        if (args.Sorts.Any())
+        {
+            foreach (var s in args.Sorts)
+            {
+                var propertyInfo = typeof(Produto).GetProperty(s.Property);
+                query = s.SortOrder == SortOrder.Ascending ? query.OrderBy(o => propertyInfo.GetValue(o, null)) : query.OrderByDescending(o => propertyInfo.GetValue(o, null));
+            }
+        }
+
+        count = query.Count();
+
+        produtos = query.ToList();
+
+        isLoading = false;
+    }
+
+}

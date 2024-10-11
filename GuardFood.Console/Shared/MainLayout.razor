@@ -1,0 +1,65 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager;
+
+<PageTitle>GuardFood :: </PageTitle>
+
+<RadzenComponents />
+
+<RadzenLayout>
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+                <RadzenLabel Text="Guard Food" />
+            </RadzenStack>
+            <RadzenStack>
+                <RadzenProfileMenu>
+                    <Template>
+                        @*<RadzenLabel Text="@(usuario.UserName)" Style="margin-right: 0.5rem" />
+                            <RadzenGravatar Email="@(usuario.Email)" />*@
+                    </Template>
+                    <ChildContent>
+                        @*<RadzenProfileMenuItem Text="Ver Perfil" Path="menu" Icon="account_circle"></RadzenProfileMenuItem>*@
+                        <div>
+                            <RadzenProfileMenuItem Text="Trocar Senha" Icon="lock_reset"></RadzenProfileMenuItem>
+                        </div>
+                        <div onclick="sairSistema()">
+                            <RadzenProfileMenuItem Text="Sair" Icon="logout"></RadzenProfileMenuItem>
+                        </div>
+                    </ChildContent>
+                </RadzenProfileMenu>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenSidebar @bind-Expanded="@sidebarExpanded" Responsive="true">
+        <RadzenPanelMenu>
+            <RadzenPanelMenuItem Text="Home" Icon="home" Path="/" />
+            <RadzenPanelMenuItem Text="Ordem de Serviço" Icon="assignment" Path="/OrdemServico" />
+            <RadzenPanelMenuItem Text="Clientes" Icon="people_alt" Path="/Cliente" />
+            <RadzenPanelMenuItem Text="Usuários" Icon="account_box" Path="/Usuario" />
+        </RadzenPanelMenu>
+    </RadzenSidebar>
+    <RadzenBody>
+        <div id="corpo-principal" class="rz-p-4">
+            @Body
+        </div>
+    </RadzenBody>
+</RadzenLayout>
+
+@code{
+
+    bool sidebarExpanded = true;
+
+    [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        var user = (await AuthStat).User;
+        if (!user.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo($"/Login?ReturnUrl={Uri.EscapeDataString(NavigationManager.Uri)}");
+        }
+    }
+
+}

@@ -1,6 +1,6 @@
 ﻿using GuardFood.Core.Entities;
 
-namespace GuardFood.Infrastructure.Data.ViewModel;
+namespace GuardFood.Core.Data.ViewModel;
 
 public class RestauranteProdutoViewModel
 {

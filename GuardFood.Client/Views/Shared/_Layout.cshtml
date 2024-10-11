@@ -1,0 +1,84 @@
+﻿@inject Microsoft.AspNetCore.Identity.UserManager<Usuario> userManager;
+
+@{
+    var usuario = userManager.GetUserAsync(User).Result;
+    var titulo = string.IsNullOrEmpty(ViewBag.Title) ? "GuardFood" : ViewBag.Title + " :: GuardFood";
+    var lightMode = bool.Parse(Context.Request.Cookies["lightMode"] ?? "false");
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+    <title>@ViewData["Title"] - GuardFood.Client</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/GuardFood.Client.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/software-base.css?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)" id="temaBlazor">
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <style>
+        .rz-label, .rz-breadcrumb-item + .rz-breadcrumb-item::before, .rz-breadcrumb-item > .rzi, .rz-dialog-confirm-message, .rz-dropdown-clear-icon, .rz-datatable-emptymessage {
+            color: var(--rz-text-color);
+        }
+
+        .rz-dropdown-clear-icon {
+            margin-right: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <component type="typeof(GuardFood.Client.Components.Shared.Layout)" render-mode="Server" param-LightMode="lightMode" param-usuario="usuario" />
+    <div class="container d-none">
+        @RenderBody()
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)" asp-append-version="true"></script>
+
+    <script>
+
+        function insereBody() {
+            $(".container").appendTo("#corpo-principal");
+            $(".container").removeClass("d-none");
+        }
+
+        function temaClaro() {
+            $("#temaBlazor").attr("href", "_content/Radzen.Blazor/css/software-base.css");
+            getDados("@(Url.Action("TemaClaro", "Usuario"))", {}, "POST");
+        }
+
+        function temaEscuro() {
+            $("#temaBlazor").attr("href", "_content/Radzen.Blazor/css/dark-base.css");
+            getDados("@(Url.Action("TemaEscuro", "Usuario"))", {}, "POST");
+        }
+
+        function trocaSenha(model) {
+            var retorno = null
+            $.ajax({
+                method: 'POST',
+                url: "@(Url.Action("TrocaSenha", "Autenticacao"))",
+                data: model,
+                dataType: 'json',
+                async: false,
+                success: function (data) {
+                    retorno = data;
+                },
+                error: function (e) {
+                    return {
+                        Sucesso: false,
+                        Mensagem: e.errorText
+                    };
+                }
+            });
+            return retorno;
+        }
+
+    </script>
+</body>
+</html>

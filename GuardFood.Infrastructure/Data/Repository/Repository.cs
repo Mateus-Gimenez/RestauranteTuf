@@ -1,10 +1,12 @@
-﻿using GuardFood.Infrastructure.Context;
-using GuardFood.Infrastructure.Data.Interfaces;
+﻿using GuardFood.Core.Context;
+using GuardFood.Core.Data.Interfaces;
+using GuardFood.Core.Data.ViewModel;
+using GuardFood.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace GuardFood.Infrastructure.Data.Repository
+namespace GuardFood.Core.Data.Repository
 {
-    public abstract class Repository<T> : IRepository<T> where T : class
+    public abstract class Repository<T> : IRepository<T> where T : GuardFoodCommon
     {
         private readonly GFContext _context;
 
@@ -12,11 +14,12 @@ namespace GuardFood.Infrastructure.Data.Repository
         {
             _context = context;
         }
+
         public T BuscarPorId(Guid id)
         {
             try
             {
-                return _context.Set<T>().Find(id);
+                return _context.Set<T>().FirstOrDefault(f => f.Id == id && f.Ativo);
             }
             catch (Exception ex)
             {
@@ -24,55 +27,89 @@ namespace GuardFood.Infrastructure.Data.Repository
             }
         }
 
-        public bool Deletar(Guid id)
+        public RetornoViewModel Deletar(Guid id)
         {
             try
             {
-                var entidade = _context.Set<T>().Find(id);
-                if (entidade != null)
-                {
-                    _context.Set<T>().Remove(entidade);
-                    _context.SaveChanges();
-                    return true;
-                }
-                return false;
+                var entidade = _context.Set<T>().Find(id) ?? throw new Exception("Registro não encontrado");
+
+                entidade.Alteracao = DateTime.Now;
+                entidade.Ativo = false;
+                _context.Entry(entidade).State = EntityState.Modified;
+                _context.SaveChanges();
+
+                return new RetornoViewModel { Sucesso = true, Mensagem = "Registro removido com sucesso" };
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                return false;
+                return new RetornoViewModel { Sucesso = false, Mensagem = "Erro ao remover: " + e.Message };
             }
         }
 
-        public bool Editar(T classe)
+        public void Editar(T classe)
         {
-            try
-            {
-                _context.Entry(classe).State = EntityState.Modified;
-                _context.SaveChanges();
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            _context.Entry(classe).State = EntityState.Modified;
+            _context.SaveChanges();
         }
 
         public IEnumerable<T> BuscarTodos()
         {
-            return _context.Set<T>().ToList();
+            return _context.Set<T>().Where(w => w.Ativo).ToList();
         }
 
-        public bool Inserir(T entidade)
+        public IEnumerable<T> BuscarTodos(string[] includes)
+        {
+            var dados = _context.Set<T>().Where(t => t.Ativo);
+
+
+            IQueryable<T> dadosCompletos = null;
+
+            foreach (var include in includes)
+            {
+                dadosCompletos = dados.Include(include);
+            }
+
+            return dadosCompletos.ToList();
+        }
+
+        public void Inserir(T entidade)
+        {
+            _context.Set<T>().Add(entidade);
+            _context.SaveChanges();
+        }
+
+        public RetornoViewModel InserirEditar(T entidade)
         {
             try
             {
-                _context.Set<T>().Add(entidade);
-                _context.SaveChanges();
-                return true;
+                var possui = _context.Set<T>().Any(a => a.Id == entidade.Id);
+                
+                entidade.Alteracao = DateTime.Now;
+                entidade.Ativo = true;
+
+                if (possui)
+                {
+                    Editar(entidade);
+                }
+                else
+                {
+                    entidade.Inclusao = DateTime.Now;
+                    Inserir(entidade);
+                }
+
+                return new RetornoViewModel()
+                {
+                    Sucesso = true,
+                    Mensagem = $"Registro {(possui ? "editado" : "inserido")} com sucesso"
+                };
             }
-            catch (Exception)
+            catch (Exception e) 
             {
-                return false;
+                return new RetornoViewModel()
+                {
+                    Sucesso = false,
+                    Mensagem = "Erro: " + e.Message,
+                };
             }
         }
     }
