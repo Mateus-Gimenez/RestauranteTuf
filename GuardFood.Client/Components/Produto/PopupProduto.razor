@@ -54,13 +54,11 @@
 
     async void OnSubmit(Produto produto)
     {
-        //using var dbContext = DbFactory.CreateDbContext();
-
         using (var scope = ScopeFactory.CreateScope())
         {
             var retorno = scope.ServiceProvider.GetRequiredService<IProdutoRepository>().InserirEditar(produto);
 
-            //await Js.InvokeVoidAsync("notifica", retorno.Sucesso ? "" : "Erro", retorno.Mensagem, retorno.Sucesso);
+            await Js.InvokeVoidAsync("notifica", retorno.Sucesso ? "" : "Erro", retorno.Mensagem, retorno.Sucesso);
             if (retorno.Sucesso)
             {
                 DialogService.Close();
