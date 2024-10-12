@@ -97,7 +97,7 @@
 
     async void exibePopupTrocaSenha()
     {
-        //await DialogService.OpenAsync<>("Trocar Senha", null, new DialogOptions() { Width = "400px", Height = "auto", Resizable = true, Draggable = true });
+        await DialogService.OpenAsync<GuardFood.Client.Components.Autenticacao.TrocaSenha>("Trocar Senha", null, new DialogOptions() { Width = "400px", Height = "auto", Resizable = true, Draggable = true });
     }
 
     async void redirecionaTela(string detalhe)
