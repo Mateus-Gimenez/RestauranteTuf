@@ -1,5 +1,6 @@
 ﻿using GuardFood.Core.Data.Interfaces;
 using GuardFood.Core.Data.ViewModel;
+using GuardFood.Core.Entities;
 using GuardFood.Core.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -28,6 +29,11 @@ namespace GuardFood.Client.Controllers
             ViewData["ReturnUrl"] = ReturnUrl;
             if (!_usuarioRepository.VerificaUsuarios())
             {
+                var restaurante = new Restaurante()
+                {
+
+                };
+
                 var usuarioMaster = new Usuario()
                 {
                     UserName = "master",

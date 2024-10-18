@@ -16,9 +16,11 @@ namespace GuardFood.Core.Context
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Restaurante> Restaurantes { get; set; }
+        public DbSet<Mesa> Mesas { get; set; }
         public DbSet<Pedido> Pedidos { get; set; }
-        public DbSet<Produto> Produto { get; set; }
-        public DbSet<RestauranteProduto> RestauranteProdutos { get; set; }
+        public DbSet<PedidoProduto> PedidoProdutos { get; set; }
+        public DbSet<Produto> Produtos { get; set; }
+        public DbSet<ProdutoCategoria> ProdutoCategorias { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

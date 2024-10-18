@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GuardFood.Core.Migrations
 {
     [DbContext(typeof(GFContext))]
-    [Migration("20241008000746_initial")]
+    [Migration("20241018020630_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,6 +23,35 @@ namespace GuardFood.Core.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("GuardFood.Core.Entities.Mesa", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Alteracao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Codigo")
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<DateTime>("Inclusao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("RestauranteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestauranteId");
+
+                    b.ToTable("Mesa");
+                });
 
             modelBuilder.Entity("GuardFood.Core.Entities.Pedido", b =>
                 {
@@ -36,18 +65,78 @@ namespace GuardFood.Core.Migrations
                     b.Property<bool>("Ativo")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Codigo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Codigo"), 1L, 1);
 
                     b.Property<DateTime>("Inclusao")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Localizacao")
+                    b.Property<Guid>("MesaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("NomeCliente")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("RestauranteId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MesaId");
+
+                    b.HasIndex("RestauranteId");
+
                     b.ToTable("Pedido");
+                });
+
+            modelBuilder.Entity("GuardFood.Core.Entities.PedidoProduto", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Alteracao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Inclusao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NomeProduto")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Observacao")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("PedidoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProdutoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("RestauranteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("ValorUnitario")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PedidoId");
+
+                    b.HasIndex("ProdutoId");
+
+                    b.HasIndex("RestauranteId");
+
+                    b.ToTable("PedidoProduto");
                 });
 
             modelBuilder.Entity("GuardFood.Core.Entities.Produto", b =>
@@ -71,12 +160,50 @@ namespace GuardFood.Core.Migrations
                     b.Property<string>("Nome")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("ProdutoCategoriaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RestauranteId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<decimal>("Valor")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ProdutoCategoriaId");
+
+                    b.HasIndex("RestauranteId");
+
                     b.ToTable("Produto");
+                });
+
+            modelBuilder.Entity("GuardFood.Core.Entities.ProdutoCategoria", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Alteracao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Inclusao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Nome")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("RestauranteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestauranteId");
+
+                    b.ToTable("ProdutoCategoria");
                 });
 
             modelBuilder.Entity("GuardFood.Core.Entities.Restaurante", b =>
@@ -100,6 +227,12 @@ namespace GuardFood.Core.Migrations
                     b.Property<string>("Descricao")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Endereco")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("Inclusao")
                         .HasColumnType("datetime2");
 
@@ -109,39 +242,12 @@ namespace GuardFood.Core.Migrations
                     b.Property<string>("Nome")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Telefone")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Restaurante");
-                });
-
-            modelBuilder.Entity("GuardFood.Core.Entities.RestauranteProduto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Alteracao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("Inclusao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("ProdutoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("RestauranteId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProdutoId");
-
-                    b.HasIndex("RestauranteId");
-
-                    b.ToTable("RestauranteProduto");
                 });
 
             modelBuilder.Entity("GuardFood.Core.Identity.Usuario", b =>
@@ -198,8 +304,14 @@ namespace GuardFood.Core.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("RestauranteId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Tipo")
+                        .HasColumnType("int");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -217,6 +329,8 @@ namespace GuardFood.Core.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("RestauranteId");
 
                     b.ToTable("Usuario", (string)null);
                 });
@@ -358,8 +472,44 @@ namespace GuardFood.Core.Migrations
                     b.ToTable("UsuarioToken", (string)null);
                 });
 
-            modelBuilder.Entity("GuardFood.Core.Entities.RestauranteProduto", b =>
+            modelBuilder.Entity("GuardFood.Core.Entities.Mesa", b =>
                 {
+                    b.HasOne("GuardFood.Core.Entities.Restaurante", "Restaurante")
+                        .WithMany()
+                        .HasForeignKey("RestauranteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurante");
+                });
+
+            modelBuilder.Entity("GuardFood.Core.Entities.Pedido", b =>
+                {
+                    b.HasOne("GuardFood.Core.Entities.Mesa", "Mesa")
+                        .WithMany()
+                        .HasForeignKey("MesaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GuardFood.Core.Entities.Restaurante", "Restaurante")
+                        .WithMany()
+                        .HasForeignKey("RestauranteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mesa");
+
+                    b.Navigation("Restaurante");
+                });
+
+            modelBuilder.Entity("GuardFood.Core.Entities.PedidoProduto", b =>
+                {
+                    b.HasOne("GuardFood.Core.Entities.Pedido", "Pedido")
+                        .WithMany()
+                        .HasForeignKey("PedidoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GuardFood.Core.Entities.Produto", "Produto")
                         .WithMany()
                         .HasForeignKey("ProdutoId")
@@ -372,7 +522,50 @@ namespace GuardFood.Core.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Pedido");
+
                     b.Navigation("Produto");
+
+                    b.Navigation("Restaurante");
+                });
+
+            modelBuilder.Entity("GuardFood.Core.Entities.Produto", b =>
+                {
+                    b.HasOne("GuardFood.Core.Entities.ProdutoCategoria", "ProdutoCategoria")
+                        .WithMany()
+                        .HasForeignKey("ProdutoCategoriaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GuardFood.Core.Entities.Restaurante", "Restaurante")
+                        .WithMany()
+                        .HasForeignKey("RestauranteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProdutoCategoria");
+
+                    b.Navigation("Restaurante");
+                });
+
+            modelBuilder.Entity("GuardFood.Core.Entities.ProdutoCategoria", b =>
+                {
+                    b.HasOne("GuardFood.Core.Entities.Restaurante", "Restaurante")
+                        .WithMany()
+                        .HasForeignKey("RestauranteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurante");
+                });
+
+            modelBuilder.Entity("GuardFood.Core.Identity.Usuario", b =>
+                {
+                    b.HasOne("GuardFood.Core.Entities.Restaurante", "Restaurante")
+                        .WithMany()
+                        .HasForeignKey("RestauranteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Restaurante");
                 });

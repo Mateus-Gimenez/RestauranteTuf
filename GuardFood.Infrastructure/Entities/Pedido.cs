@@ -10,10 +10,22 @@ namespace GuardFood.Core.Entities
     [Table("Pedido")]
     public class Pedido : GuardFoodCommon
     {
-        public string Descricao { get; set; }
-        public string Localizacao { get; set; }
-        
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Codigo { get; set; }
+
+        public string NomeCliente { get; set; }
+
+        [ForeignKey("Mesa")]
+        public Guid MesaId { get; set; }
+        public Mesa Mesa { get; set; }
+
         [NotMapped]
-        public string Usuario { get; set; }
+        public string CodigoFormatado
+        {
+            get
+            {
+                return Codigo.ToString("00000");
+            }
+        } 
     }
 }

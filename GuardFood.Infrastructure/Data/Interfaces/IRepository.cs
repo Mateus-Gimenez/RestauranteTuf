@@ -14,6 +14,10 @@ namespace GuardFood.Core.Data.Interfaces
 
         IEnumerable<T> BuscarTodos(string[] includes);
 
+        IEnumerable<T> BuscarTodosPorRestauranteId(Guid restauranteId);
+
+        IEnumerable<T> BuscarTodosPorRestauranteId(Guid restauranteId, string[] includes);
+
         void Inserir(T classe);
 
         void Editar(T classe);

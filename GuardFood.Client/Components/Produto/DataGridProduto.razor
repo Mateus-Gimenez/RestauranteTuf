@@ -18,12 +18,6 @@
         <RadzenButton Text="Adicionar Produto" Click=@(() => ExibePopupProduto()) />
     </HeaderTemplate>
     <Columns>
-        <RadzenDataGridColumn TItem="Produto" Context="Id" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" Width="100px">
-            <Template Context="Id">
-                <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="edit" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="(args => ExibePopupEditarProduto(Id))" title="Editar" />
-                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Click="(args => Delete(Id))" class="my-1 ms-1" title="Remover" />
-            </Template>
-        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Produto" Property="Nome" Title="Nome" Filterable="true" Sortable="true" FilterOperator="FilterOperator.StartsWith">
             <FooterTemplate>
                 <b>@count</b> Registros
@@ -33,6 +27,12 @@
         <RadzenDataGridColumn TItem="Produto" Property="ValorMonetario" Title="Valor" />
         <RadzenDataGridColumn TItem="Produto" Property="Inclusao" Title="Dt. Inclusão" SortOrder="SortOrder.Descending" />
         <RadzenDataGridColumn TItem="Produto" Property="Alteracao" Title="Dt. Alteração" />
+        <RadzenDataGridColumn TItem="Produto" Context="Id" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" Width="100px" FrozenPosition="FrozenColumnPosition.Right">
+            <Template Context="Id">
+                <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="edit" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="(args => ExibePopupEditarProduto(Id))" title="Editar" />
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Click="(args => Delete(Id))" class="my-1 ms-1" title="Remover" />
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
@@ -77,7 +77,7 @@
 
         using var dbContext = DbFactory.CreateDbContext();
 
-        var query = dbContext.Produto.Where(w => w.Ativo).AsEnumerable();
+        var query = dbContext.Produtos.Where(w => w.Ativo).AsEnumerable();
 
 
         if (!string.IsNullOrEmpty(args.Filter))

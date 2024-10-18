@@ -21,7 +21,7 @@ namespace GuardFood.Core.Data.Repository
             {
                 return _context.Set<T>().FirstOrDefault(f => f.Id == id && f.Ativo);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
                 return null;
             }
@@ -60,6 +60,26 @@ namespace GuardFood.Core.Data.Repository
         public IEnumerable<T> BuscarTodos(string[] includes)
         {
             var dados = _context.Set<T>().Where(t => t.Ativo);
+
+
+            IQueryable<T> dadosCompletos = null;
+
+            foreach (var include in includes)
+            {
+                dadosCompletos = dados.Include(include);
+            }
+
+            return dadosCompletos.ToList();
+        }
+
+        public IEnumerable<T> BuscarTodosPorRestauranteId(Guid restauranteId)
+        {
+            return _context.Set<T>().Where(w => w.Ativo && w.RestauranteId == restauranteId).ToList();
+        }
+
+        public IEnumerable<T> BuscarTodosPorRestauranteId(Guid restauranteId, string[] includes)
+        {
+            var dados = _context.Set<T>().Where(t => t.Ativo && t.RestauranteId == restauranteId);
 
 
             IQueryable<T> dadosCompletos = null;
