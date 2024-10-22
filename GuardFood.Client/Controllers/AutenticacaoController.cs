@@ -14,12 +14,14 @@ namespace GuardFood.Client.Controllers
         private readonly UserManager<Usuario> _userManager;
         private readonly SignInManager<Usuario> _signInManager;
         private readonly IUsuarioRepository _usuarioRepository;
+        private readonly IRestauranteRepository _restauranteRepository;
 
-        public AutenticacaoController(UserManager<Usuario> userManager, SignInManager<Usuario> signInManager, IUsuarioRepository usuarioRepository)
+        public AutenticacaoController(UserManager<Usuario> userManager, SignInManager<Usuario> signInManager, IUsuarioRepository usuarioRepository, IRestauranteRepository restauranteRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _usuarioRepository = usuarioRepository;
+            _restauranteRepository = restauranteRepository;
         }
 
         [HttpGet]
@@ -31,8 +33,12 @@ namespace GuardFood.Client.Controllers
             {
                 var restaurante = new Restaurante()
                 {
-
+                    Nome = "Restaurante Master",
+                    Descricao = "Master",
+                    Email = "master@gmail.com",
                 };
+
+                _restauranteRepository.InsertOrReplace(restaurante);
 
                 var usuarioMaster = new Usuario()
                 {
@@ -40,6 +46,7 @@ namespace GuardFood.Client.Controllers
                     Nome = "Master",
                     Email = "master@gmail.com",
                     PhoneNumber = "1234567890",
+                    RestauranteId = restaurante.Id,
                 };
                 _userManager.CreateAsync(usuarioMaster, "Master@2024");
             }
