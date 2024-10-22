@@ -10,6 +10,8 @@ namespace GuardFood.Core.Entities
     [Table("Produto")]
     public class Produto : GuardFoodCommon
     {
+        public int Ordem { get; set; }
+
         public string Nome { get; set; }
 
         public string Descricao { get; set; }
