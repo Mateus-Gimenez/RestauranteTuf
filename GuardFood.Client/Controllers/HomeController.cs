@@ -19,7 +19,13 @@ namespace GuardFood.Client.Controllers
             _logger = logger;
         }
 
+        [AllowAnonymous]
         public IActionResult Index()
+        {
+            return View("~/Views/Home/IndexLayout.cshtml");
+        }
+
+        public IActionResult Dashboard()
         {
             ViewData["RestauranteId"] = _userManager.GetUserAsync(User).Result.RestauranteId;
             return View();

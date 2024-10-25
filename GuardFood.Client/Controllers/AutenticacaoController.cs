@@ -110,7 +110,7 @@ namespace GuardFood.Client.Controllers
                 {
                     return new RetornoViewModel
                     {
-                        Sucesso = true,
+                         Sucesso = true,                       
                         Mensagem = "Senha alterada com sucesso"
                     };
                 }

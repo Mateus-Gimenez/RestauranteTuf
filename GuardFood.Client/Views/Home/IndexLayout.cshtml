@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    Layout = "";
+}
+
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -218,7 +222,7 @@
     <div class="navbar">
         <div class="logo">Steak with Fries</div>
         <div class="buttons">
-            <button>Login</button>
+            <button onclick="redirecionaTela()">Login</button>
             <button>Cadastrar</button>
         </div>
     </div>
@@ -269,3 +273,13 @@
     </div>
 </body>
 </html>
+
+<script>
+
+    function redirecionaTela(url) {
+        window.location.href = "/Login";
+    }
+
+
+
+</script>

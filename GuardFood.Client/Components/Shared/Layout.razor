@@ -55,7 +55,7 @@
     </RadzenHeader>
     <RadzenSidebar @bind-Expanded="@sidebarExpanded" Responsive="true">
         <RadzenPanelMenu>
-            <RadzenPanelMenuItem Text="Home" Icon="home" Path="/" />
+            <RadzenPanelMenuItem Text="Home" Icon="home" Path="/Home/Dashboard" />
             <RadzenPanelMenuItem Text="Produtos" Icon="inventory_2" Path="/Produto" />
             <RadzenPanelMenuItem Text="Mesas" Icon="table_restaurant" Path="/Mesa" />
             <RadzenPanelMenuItem Text="Pedidos" Icon="receipt_long" Path="/Pedido" />
@@ -110,4 +110,11 @@
     {
         await Js.InvokeVoidAsync("sairSistema");
     }
+
+    async void redirecionaLogin()
+    {
+        // Use o método JavaScript para redirecionar para a página de login.
+        await Js.InvokeVoidAsync("redirecionaTela", "/Login");
+    }
+
 }
