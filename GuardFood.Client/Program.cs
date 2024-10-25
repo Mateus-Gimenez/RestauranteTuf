@@ -33,8 +33,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = new PathString("/Login");
 });
 
-builder.Services.AddServerSideBlazor().AddHubOptions(options =>
+builder.Services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; }).AddHubOptions(options =>
 {
+    options.EnableDetailedErrors = true;
     options.MaximumReceiveMessageSize = 10485760;
 });
 builder.Services.AddHttpClient();
@@ -42,8 +43,10 @@ builder.Services.AddRadzenComponents();
 
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
+builder.Services.AddScoped<IProdutoCategoriaRepository, ProdutoCategoriaRepository>();
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IRestauranteRepository, RestauranteRepository>();
+builder.Services.AddScoped<IMesaRepository, MesaRepository>();
 
 
 var app = builder.Build();

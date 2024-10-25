@@ -24,6 +24,7 @@ namespace GuardFood.Client.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            ViewData["RestauranteId"] = _userManager.GetUserAsync(User).Result.RestauranteId;
             return View();
         }
 

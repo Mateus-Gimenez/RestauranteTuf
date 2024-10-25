@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-GuardFood.Client-fae9927c-9bb3-4012-925d-01305f7a7744</UserSecretsId>
   </PropertyGroup>
@@ -20,10 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GuardFood.Infrastructure\GuardFood.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Components\Home\" />
   </ItemGroup>
 
 </Project>

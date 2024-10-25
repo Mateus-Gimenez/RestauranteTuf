@@ -1,0 +1,107 @@
+﻿@using System.Linq.Dynamic.Core;
+@inject IJSRuntime JsRuntime;
+@inject DialogService DialogService;
+@inject IServiceScopeFactory scopeFactory;
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+    <RadzenLabel><h4>Mesas</h4></RadzenLabel>
+    <RadzenBreadCrumb>
+        <RadzenBreadCrumbItem Path="/" Text="Home" Icon="home" />
+        <RadzenBreadCrumbItem Text="Mesas" Icon="table_restaurant" />
+    </RadzenBreadCrumb>
+</RadzenStack>
+
+<RadzenDataGrid Data="@mesas" @ref="gridMesa" LoadData="@LoadDataMesa">
+    <HeaderTemplate>
+        <RadzenButton Text="Adicionar Mesa" Click=@(() => ExibePopupMesa()) />
+    </HeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn TItem="Mesa" Property="Codigo" Title="Código" Filterable="true" Sortable="true" FilterOperator="FilterOperator.StartsWith">
+            <FooterTemplate>
+                <b>@count</b> Registros
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Mesa" Property="Inclusao" Title="Dt. Inclusão" SortOrder="SortOrder.Descending" />
+        <RadzenDataGridColumn TItem="Mesa" Context="Id" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" Width="100px" FrozenPosition="FrozenColumnPosition.Right">
+            <Template Context="Id">
+                <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="edit" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="(args => ExibePopupEditarMesa(Id))" title="Editar" />
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Click="(args => DeleteMesa(Id))" class="my-1 ms-1" title="Remover" />
+            </Template>
+        </RadzenDataGridColumn>
+
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+
+    [Parameter]
+    public Guid restauranteId { get; set; }
+
+    // Produto
+    RadzenDataGrid<Mesa> gridMesa;
+    IEnumerable<Mesa> mesas;
+    int count;
+    bool isLoading = false;
+
+    async void ExibePopupMesa()
+    {
+        await DialogService.OpenAsync<PopupMesa>("Adicionar Mesa", new Dictionary<string, object>() { { "dataGridMesa", this }, { "restauranteId", restauranteId } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
+    }
+
+    async Task ExibePopupEditarMesa(Mesa mesa)
+    {
+        await DialogService.OpenAsync<PopupMesa>("Editar Mesa", new Dictionary<string, object>() { { "dataGridMesa", this }, { "editar", true }, { "objeto", mesa } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
+    }
+
+    async Task DeleteMesa(Mesa objeto)
+    {
+        var popupConfirma = await DialogService.Confirm($"Deseja mesmo deletar a mesa {objeto.Codigo}?", "Deletar Mesa", new ConfirmOptions() { OkButtonText = "Sim", CancelButtonText = "Não" });
+        if (popupConfirma == true)
+        {
+            using (var scope = scopeFactory.CreateScope())
+            {
+                scope.ServiceProvider.GetRequiredService<IMesaRepository>().Deletar(objeto.Id);
+            }
+            await Reset();
+        }
+    }
+
+    public async Task Reset()
+    {
+        gridMesa.Reset(true);
+        await gridMesa.FirstPage(true);
+    }
+
+    async Task LoadDataMesa(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        await Task.Yield();
+
+        var query = new List<Mesa>().AsEnumerable();
+        using (var scope = scopeFactory.CreateScope())
+        {
+            query = scope.ServiceProvider.GetRequiredService<IMesaRepository>().BuscarTodosPorRestauranteId(restauranteId).AsEnumerable();
+        }
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.AsQueryable().Where(args.Filter).AsEnumerable();
+        }
+
+        if (args.Sorts.Any())
+        {
+            foreach (var s in args.Sorts)
+            {
+                var propertyInfo = typeof(Produto).GetProperty(s.Property);
+                query = s.SortOrder == SortOrder.Ascending ? query.OrderBy(o => propertyInfo.GetValue(o, null)) : query.OrderByDescending(o => propertyInfo.GetValue(o, null));
+            }
+        }
+
+        count = query.Count();
+
+        mesas = query.ToList();
+
+        isLoading = false;
+    }
+}

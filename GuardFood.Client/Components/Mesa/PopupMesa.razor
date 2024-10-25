@@ -1,0 +1,60 @@
+﻿@inject IJSRuntime Js;
+@inject DialogService DialogService;
+@inject IServiceScopeFactory ScopeFactory;
+
+<RadzenTemplateForm TItem="Mesa" Data=@objeto Submit=@OnSubmit>
+    <RadzenFieldset Text="">
+        <RadzenStack Gap="1rem" Class="rz-p-4 rz-p-md-12" Style="padding: 0 !important">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="12">
+                    <RadzenLabel Text="Código" />
+                    <RadzenTextBox Name="Codigo" @bind-Value=@objeto.Codigo Style="display: block; width: 100%" MaxLength="5" AutoComplete="false" />
+                    <RadzenRequiredValidator Component="Codigo" Text="Código é de Preenchimento Obrigatório" Popup="true" Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" Class="rz-mt-4">
+                <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
+                    <RadzenButton ButtonType="ButtonType.Submit" Text="@(editar ? "Editar" : "Adicionar")"></RadzenButton>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </RadzenFieldset>
+</RadzenTemplateForm>
+
+
+@code {
+
+    [Parameter]
+    public Guid restauranteId { get; set; }
+
+    [Parameter]
+    public DataGridMesa dataGridMesa { get; set; }
+
+    [Parameter]
+    public Mesa objeto { get; set; } = new Mesa();
+
+    [Parameter]
+    public bool editar { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    async void OnSubmit(Mesa objeto)
+    {
+        using (var scope = ScopeFactory.CreateScope())
+        {
+            objeto.RestauranteId = objeto.RestauranteId == Guid.Empty ? restauranteId : objeto.RestauranteId;
+            var retorno = scope.ServiceProvider.GetRequiredService<IMesaRepository>().InserirEditar(objeto);
+
+            await Js.InvokeVoidAsync("notifica", retorno.Sucesso ? "" : "Erro", retorno.Mensagem, retorno.Sucesso);
+            if (retorno.Sucesso)
+            {
+                DialogService.Close();
+                await dataGridMesa.Reset();
+            }
+        }
+
+    }
+}

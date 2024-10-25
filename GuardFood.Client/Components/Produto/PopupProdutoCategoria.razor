@@ -1,0 +1,62 @@
+﻿@inject IJSRuntime Js;
+@inject DialogService DialogService;
+@inject IServiceScopeFactory ScopeFactory;
+
+<RadzenTemplateForm TItem="ProdutoCategoria" Data=@categoria Submit=@OnSubmit>
+    <RadzenFieldset>
+        <RadzenStack Gap="1rem" Class="rz-p-4 rz-p-md-12" Style="padding: 0 !important">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="12">
+                    <RadzenLabel Text="Nome" />
+                    <RadzenTextBox Name="Nome" @bind-Value=@categoria.Nome Style="display: block; width: 100%" MaxLength="100" AutoComplete="false" />
+                    <RadzenRequiredValidator Component="Nome" Text="Nome é de Preenchimento Obrigatório" Popup="true" Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="12">
+                    <RadzenLabel Text="Ordem" />
+                    <RadzenNumeric RadzenNumeric TValue="int"  Name="Ordem" @bind-Value=@categoria.Ordem Style="display: block; width: 100%" MaxLength="100" AutoComplete="false" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" Class="rz-mt-4">
+                <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
+                    <RadzenButton ButtonType="ButtonType.Submit" Text="@(editar ? "Editar" : "Adicionar")"></RadzenButton>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </RadzenFieldset>
+</RadzenTemplateForm>
+
+
+@code {
+
+    [Parameter]
+    public DataGridProduto dataGridProduto { get; set; }
+
+    [Parameter]
+    public ProdutoCategoria categoria { get; set; } = new ProdutoCategoria();
+
+    [Parameter]
+    public bool editar { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    async void OnSubmit(ProdutoCategoria objeto)
+    {
+        using (var scope = ScopeFactory.CreateScope())
+        {
+            var retorno = scope.ServiceProvider.GetRequiredService<IProdutoCategoriaRepository>().InserirEditar(objeto);
+
+            await Js.InvokeVoidAsync("notifica", retorno.Sucesso ? "" : "Erro", retorno.Mensagem, retorno.Sucesso);
+            if (retorno.Sucesso)
+            {
+                DialogService.Close();
+                await dataGridProduto.Reset();
+            }
+        }
+
+    }
+}

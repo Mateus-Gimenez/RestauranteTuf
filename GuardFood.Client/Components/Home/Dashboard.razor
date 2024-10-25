@@ -1,0 +1,120 @@
+﻿@inject IJSRuntime JsRuntime;
+@inject DialogService DialogService;
+
+<style>
+
+    .card-home:hover {
+        background-color: var(--rz-secondary) !important;
+        cursor: pointer !important;
+    }
+</style>
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+    <RadzenLabel><h4>Home</h4></RadzenLabel>
+    <RadzenBreadCrumb>
+        <RadzenBreadCrumbItem Text="Home" Icon="home" />
+    </RadzenBreadCrumb>
+</RadzenStack>
+
+<RadzenStack>
+    <RadzenRow Gap="2rem" Class="rz-p-0 rz-p-lg-4">
+        <RadzenColumn Size="12" SizeMD="4">
+            <div onclick="redirecionaTela('/Pedido')">
+                <RadzenCard Style="width: 100%;" Class="rz-border-radius-3 text-center card-home">
+                    <RadzenIcon Icon="assignment" Style="font-size: 2.5rem; color: var(--rz-text-color)" />
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Pedidos</RadzenText>
+                </RadzenCard>
+            </div>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="4">
+            <div onclick="redirecionaTela('/Produto')">
+                <RadzenCard Style="width: 100%;" Class="rz-border-radius-3 text-center card-home">
+                    <RadzenIcon Icon="inventory_2" Style="font-size: 2.5rem; color: var(--rz-text-color)" />
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Produtos</RadzenText>
+                </RadzenCard>
+            </div>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="4">
+            <div onclick="redirecionaTela('/Mesa')">
+                <RadzenCard Style="width: 100%;" Class="rz-border-radius-3 text-center card-home">
+                    <RadzenIcon Icon="table_restaurant" Style="font-size: 2.5rem; color: var(--rz-text-color)" />
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Mesas</RadzenText>
+                </RadzenCard>
+            </div>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenLabel><b>Vendas realizadas no ano</b></RadzenLabel>
+            <RadzenChart>
+                <RadzenColumnSeries Data="@ValorVendas" CategoryProperty="Mes" Title="2024" LineType="LineType.Dashed" ValueProperty="Valor">
+                    <RadzenSeriesDataLabels Visible="false" />
+                </RadzenColumnSeries>
+                <RadzenColumnOptions Radius="5" />
+                <RadzenValueAxis Formatter="@FormataMoeda">
+                    <RadzenGridLines Visible="true" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenLabel><b>Produtos mais pedidos no mês</b></RadzenLabel>
+            <RadzenChart>
+                <RadzenPieSeries Data="@QuantidadesProdutos" CategoryProperty="Nome" ValueProperty="Quantidade" Title="Quantidade">
+                    <RadzenSeriesDataLabels Visible="@false" />
+                </RadzenPieSeries>
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public Guid restauranteId { get; set; }
+
+    string FormataMoeda(object value)
+    {
+        return ((double)value).ToString("C", System.Globalization.CultureInfo.CreateSpecificCulture("pt-BR"));
+    }
+
+    public class ValorVendasMes
+    {
+        public decimal Valor { get; set; }
+        public string Mes { get; set; }
+    }
+
+    public class QuantidadeProduto
+    {
+        public int Quantidade { get; set; }
+        public string Nome { get; set; }
+    }
+
+    ValorVendasMes[] ValorVendas = new ValorVendasMes[]
+    {
+        new ValorVendasMes { Mes = "JAN", Valor = (decimal)125843.43 },
+        new ValorVendasMes { Mes = "FEV", Valor = (decimal)134523.89 },
+        new ValorVendasMes { Mes = "MAR", Valor = (decimal)145672.50 },
+        new ValorVendasMes { Mes = "ABR", Valor = (decimal)120342.10 },
+        new ValorVendasMes { Mes = "MAI", Valor = (decimal)137865.75 },
+        new ValorVendasMes { Mes = "JUN", Valor = (decimal)128934.67 },
+        new ValorVendasMes { Mes = "JUL", Valor = (decimal)139275.90 },
+        new ValorVendasMes { Mes = "AGO", Valor = (decimal)142365.55 },
+        new ValorVendasMes { Mes = "SET", Valor = (decimal)130432.88 },
+        new ValorVendasMes { Mes = "OUT", Valor = (decimal)136784.12 },
+        new ValorVendasMes { Mes = "NOV", Valor = (decimal)148293.23 },
+        new ValorVendasMes { Mes = "DEZ", Valor = (decimal)152374.34 }
+    };
+
+    QuantidadeProduto[] QuantidadesProdutos = new QuantidadeProduto[]
+    {
+        new QuantidadeProduto { Nome = "Filé de Frango Grelhado", Quantidade = 25 },
+        new QuantidadeProduto { Nome = "Salmão ao Molho de Maracujá", Quantidade = 15 },
+        new QuantidadeProduto { Nome = "Lasanha de Carne", Quantidade = 30 },
+        new QuantidadeProduto { Nome = "Feijoada Completa", Quantidade = 20 },
+        new QuantidadeProduto { Nome = "Strogonoff de Frango", Quantidade = 28 },
+        new QuantidadeProduto { Nome = "Bife à Parmegiana", Quantidade = 18 },
+        new QuantidadeProduto { Nome = "Spaghetti ao Pesto", Quantidade = 22 },
+        new QuantidadeProduto { Nome = "Pizza Marguerita", Quantidade = 10 },
+        new QuantidadeProduto { Nome = "Hambúrguer Artesanal", Quantidade = 52 },
+        new QuantidadeProduto { Nome = "Risoto de Cogumelos", Quantidade = 12 }
+    };
+}
