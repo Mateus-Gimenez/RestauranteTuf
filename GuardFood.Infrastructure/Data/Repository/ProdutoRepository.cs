@@ -7,10 +7,11 @@ namespace GuardFood.Core.Data.Repository
 {
     public class ProdutoRepository : Repository<Produto>, IProdutoRepository
     {
-        private readonly GFContext _context;
-        public ProdutoRepository(GFContext context) : base(context)
+        public ProdutoRepository(GFContext context) : base(context) { }
+
+        public IEnumerable<Produto> GetByCategoriaId(Guid categoriaId)
         {
-            _context = context;
+            return _context.Produtos.Where(w => w.ProdutoCategoriaId == categoriaId && w.Ativo).ToList();
         }
     }
 }

@@ -8,7 +8,7 @@ namespace GuardFood.Core.Data.Repository
 {
     public abstract class Repository<T> : IRepository<T> where T : GuardFoodCommon
     {
-        private readonly GFContext _context;
+        protected readonly GFContext _context;
 
         public Repository(GFContext context)
         {

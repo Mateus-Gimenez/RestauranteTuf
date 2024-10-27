@@ -27,57 +27,5 @@ namespace GuardFood.Client.Controllers
             ViewData["RestauranteId"] = _userManager.GetUserAsync(User).Result.RestauranteId;
             return View();
         }
-
-        [HttpGet]
-        public IEnumerable<Produto> Get()
-        {
-            return _produtoRepository.BuscarTodos();
-        }
-
-        [HttpPost]
-        public RetornoViewModel Post(string values)
-        {
-            try
-            {
-                var objeto = new Produto();
-                JsonConvert.PopulateObject(values, objeto);
-
-                return _produtoRepository.InserirEditar(objeto);
-            }
-            catch (Exception e)
-            {
-                return new RetornoViewModel()
-                {
-                    Sucesso = false,
-                    Mensagem = e.Message
-                };
-            }
-        }
-
-        [HttpPut]
-        public RetornoViewModel Put(Guid key, string values)
-        {
-            try
-            {
-                var objeto = _produtoRepository.BuscarPorId(key);
-                JsonConvert.PopulateObject(values, objeto);
-
-                return _produtoRepository.InserirEditar(objeto);
-            }
-            catch (Exception e)
-            {
-                return new RetornoViewModel()
-                {
-                    Sucesso = false,
-                    Mensagem = e.Message
-                };
-            }
-        }
-
-        [HttpDelete]
-        public RetornoViewModel Delete(Guid key)
-        {
-            return _produtoRepository.Deletar(key);
-        }
     }
 }

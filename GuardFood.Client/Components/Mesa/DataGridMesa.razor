@@ -50,7 +50,9 @@
 
     async Task ExibePopupEditarMesa(Mesa mesa)
     {
-        await DialogService.OpenAsync<PopupMesa>("Editar Mesa", new Dictionary<string, object>() { { "dataGridMesa", this }, { "editar", true }, { "objeto", mesa } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
+        var editarMesa = new Mesa();
+        JsonConvert.PopulateObject(JsonConvert.SerializeObject(mesa) ,editarMesa);
+        await DialogService.OpenAsync<PopupMesa>("Editar Mesa", new Dictionary<string, object>() { { "dataGridMesa", this }, { "editar", true }, { "objeto", editarMesa } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
     }
 
     async Task DeleteMesa(Mesa objeto)

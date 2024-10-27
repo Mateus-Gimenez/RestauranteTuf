@@ -12,5 +12,8 @@ namespace GuardFood.Core.Entities
     {
         public int Ordem { get; set; }
         public string Nome { get; set; }
+
+        [NotMapped]
+        public List<Produto> Produtos { get; set; }
     }
 }

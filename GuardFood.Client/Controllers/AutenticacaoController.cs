@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GuardFood.Client.Controllers
 {
-    [AllowAnonymous]
     public class AutenticacaoController : Controller
     {
         private readonly UserManager<Usuario> _userManager;
@@ -26,8 +25,14 @@ namespace GuardFood.Client.Controllers
 
         [HttpGet]
         [Route("/Login")]
+        [AllowAnonymous]
         public IActionResult Login(string? ReturnUrl = null)
         {
+            if(_userManager.GetUserAsync(User).Result != null)
+            {
+                return RedirectToAction("Dashboard", "Home");
+            }
+
             ViewData["ReturnUrl"] = ReturnUrl;
             if (!_usuarioRepository.VerificaUsuarios())
             {
@@ -49,6 +54,19 @@ namespace GuardFood.Client.Controllers
                     RestauranteId = restaurante.Id,
                 };
                 _userManager.CreateAsync(usuarioMaster, "Master@2024");
+            }
+
+            return View();
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("/Cadastrar")]
+        public IActionResult Cadastrar()
+        {
+            if (_userManager.GetUserAsync(User).Result != null)
+            {
+                return RedirectToAction("Dashboard", "Home");
             }
 
             return View();
@@ -132,6 +150,7 @@ namespace GuardFood.Client.Controllers
 
         [HttpGet]
         [Route("/Sair")]
+        [AllowAnonymous]
         public IActionResult Sair()
         {
             _signInManager.SignOutAsync().Wait();

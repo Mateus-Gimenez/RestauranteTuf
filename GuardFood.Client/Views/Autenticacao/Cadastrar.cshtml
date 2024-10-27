@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Cadastrar";
+}
+<style>
+    @@media (min-width: 1024px) {
+        .painel {
+            height: 100% !important;
+        }
+    }
+
+    @@media (max-width: 1023px) {
+        .painel {
+            display: none !important;
+        }
+    }
+</style>
+
+<component type="typeof(GuardFood.Client.Components.Autenticacao.Cadastrar)" render-mode="Server">
+
+    <script>
+    function realizaLogin(args) {
+        var retorno = null
+        $.ajax({
+            method: 'POST',
+            url: "@(Url.Action("RealizaLogin", "Autenticacao"))",
+            data: args,
+            dataType: 'json',
+            async: false,
+            success: function (data) {
+                retorno = data;
+            },
+            error: function (e) {
+                return {
+                    Sucesso: false,
+                    Mensagem: e.errorText
+                };
+            }
+        });
+        return retorno;
+    }
+
+    function redirecionaHome() {
+        window.location.href = '@(ViewBag.ReturnUrl)';
+    }
+    </script>

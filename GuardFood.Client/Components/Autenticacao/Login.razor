@@ -2,19 +2,88 @@
 @inject HttpClient httpClient;
 @inject NotificationService notificationService;
 
-<style>
-    .rz-login-buttons .rz-button {
-        width: 100%;
-    }
-</style>
+    <style>
 
-<RadzenComponents />
+        .rz-login-buttons .rz-button {
+            width: 100%;
+        }
 
-<RadzenCard class="rz-my-12 rz-mx-auto rz-p-4 rz-p-md-12" style="max-width: 600px; margin-left: 3rem; margin-right: 3rem">
-    <div style="width: 100%; display:flex; justify-content: center">
-    </div>
-    <RadzenLogin AllowRegister="false" AllowResetPassword="false" UserText="Login" PasswordText="Senha" RememberMeText="Lembrar" AllowRememberMe="true" RememberMe="false" Login=@(args => OnLogin(args)) />
-</RadzenCard>
+        i {
+            /* Replace this with your icon styling */
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            color: var(--rz-primary);
+            font-size: 24px;
+            line-height: 50px;
+            border-radius: 50%;
+        }
+
+        .or {
+            position: relative;
+            height: 2.2rem;
+            line-height: 50px;
+            text-align: center;
+        }
+
+            .or::before,
+            .or::after {
+                position: absolute;
+                width: 40%;
+                height: 1px;
+                top: 24px;
+                background-color: #aaa;
+                content: '';
+            }
+
+            .or::before {
+                left: 0;
+            }
+
+            .or::after {
+                right: 0;
+            }
+
+        .button-secondary {
+            background: white !important;
+            width: 100% !important;
+            color: grey !important;
+            box-shadow: none !important;
+            border: 1px solid black;
+            border-radius: 28px !important;
+            margin-top: 1rem
+        }
+
+            .button-secondary:hover {
+                background: #dddddd !important;
+                border: 1.5px solid black
+            }
+
+        @@media only screen and (max-width: 600px) {
+            .rz-mob {
+                width: 100% !important
+            }
+        }
+    </style>
+
+<RadzenColumn JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0" Class="rz-my-12 rz-mx-auto rz-border-radius-6 rz-shadow-10 rz-mob" Style="background:white;width: 30%; max-width: 90vw; height: auto; overflow: hidden; margin: 0">
+    <RadzenColumn JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Style="background: white; padding-top:1rem">
+        <RadzenIcon Icon="account_circle" Class="rz-align-center" Style="align-items: center; width:100%; font-size:5rem;"></RadzenIcon> <!-- Added a class for centering -->
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6" SizeSM="12">
+        <RadzenCard Class="rz-shadow-0 rz-border-radius-0">
+            <RadzenText TextStyle="TextStyle.DisplayH6" TextAlign="TextAlign.Center" TagName="TagName.H2" Class="rz-mb-6">
+                Informe seus Dados
+            </RadzenText>
+            <RadzenLogin AllowRegister="false" AllowResetPassword="false" UserText="E-mail" PasswordText="Senha" RememberMeText="Lembrar" ResetPasswordText="Esqueceu sua senha?" AllowRememberMe="true" RememberMe="false" Login=@(args => OnLogin(args)) />
+            <RadzenText Class="or">ou</RadzenText>
+            <RadzenButton Click="@(args => RedirecionaCadastrar())" Class="button-secondary">
+                <RadzenIcon Icon="person_add" Style="color:black; padding-right:1rem"></RadzenIcon>
+                Cadastre-se
+            </RadzenButton>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenColumn>
 
 @code {
 
@@ -34,5 +103,10 @@
         {
             await JsRuntime.InvokeVoidAsync("notifica", "Erro:", retorno.Mensagem, false);
         }
+    }
+
+    async void RedirecionaCadastrar()
+    {
+        await JsRuntime.InvokeVoidAsync("redirecionaTela", "/Cadastrar");
     }
 }

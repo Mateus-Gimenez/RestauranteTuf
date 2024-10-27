@@ -31,6 +31,9 @@
 @code {
 
     [Parameter]
+    public Guid restauranteId { get; set; }
+
+    [Parameter]
     public DataGridProduto dataGridProduto { get; set; }
 
     [Parameter]
@@ -48,6 +51,7 @@
     {
         using (var scope = ScopeFactory.CreateScope())
         {
+            objeto.RestauranteId = restauranteId;
             var retorno = scope.ServiceProvider.GetRequiredService<IProdutoCategoriaRepository>().InserirEditar(objeto);
 
             await Js.InvokeVoidAsync("notifica", retorno.Sucesso ? "" : "Erro", retorno.Mensagem, retorno.Sucesso);
