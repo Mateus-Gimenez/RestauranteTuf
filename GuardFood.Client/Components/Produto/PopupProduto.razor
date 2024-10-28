@@ -14,15 +14,15 @@
             </RadzenRow>
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="12">
-                    <RadzenLabel Text="Descrição" />
-                    <RadzenTextBox Name="Descricao" @bind-Value=@produto.Descricao Style="display: block; width: 100%" MaxLength="100" AutoComplete="false" />
+                    <RadzenLabel Text="Valor" />
+                    <RadzenNumeric RadzenNumeric TValue="decimal" Format="C" Name="Valor" @bind-Value=@produto.Valor Style="display: block; width: 100%" MaxLength="100" AutoComplete="false" />
+                    <RadzenRequiredValidator Component="Valor" Text="Valor é de Preenchimento Obrigatório" Popup="true" Style="position: absolute" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="12">
-                    <RadzenLabel Text="Valor" />
-                    <RadzenNumeric RadzenNumeric TValue="decimal" Format="C" Name="Valor" @bind-Value=@produto.Valor Style="display: block; width: 100%" MaxLength="100" AutoComplete="false" />
-                    <RadzenRequiredValidator Component="Valor" Text="Valor é de Preenchimento Obrigatório" Popup="true" Style="position: absolute" />
+                    <RadzenLabel Text="Descrição" />
+                    <RadzenTextArea Name="Descricao" @bind-Value=@produto.Descricao Style="display: block; width: 100%; height: 8rem" MaxLength="100" AutoComplete="false" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenRow AlignItems="AlignItems.Center" Class="rz-mt-4">
