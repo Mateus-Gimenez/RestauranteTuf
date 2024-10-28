@@ -12,12 +12,6 @@
                     <RadzenRequiredValidator Component="Nome" Text="Nome é de Preenchimento Obrigatório" Popup="true" Style="position: absolute" />
                 </RadzenColumn>
             </RadzenRow>
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn Size="12" SizeMD="12">
-                    <RadzenLabel Text="Ordem" />
-                    <RadzenNumeric RadzenNumeric TValue="int"  Name="Ordem" @bind-Value=@categoria.Ordem Style="display: block; width: 100%" MaxLength="100" AutoComplete="false" />
-                </RadzenColumn>
-            </RadzenRow>
             <RadzenRow AlignItems="AlignItems.Center" Class="rz-mt-4">
                 <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
                     <RadzenButton ButtonType="ButtonType.Submit" Text="@(editar ? "Editar" : "Adicionar")"></RadzenButton>
@@ -42,6 +36,9 @@
     [Parameter]
     public bool editar { get; set; } = false;
 
+    [Parameter]
+    public int? ordem { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -52,13 +49,14 @@
         using (var scope = ScopeFactory.CreateScope())
         {
             objeto.RestauranteId = restauranteId;
+            objeto.Ordem = ordem ?? objeto.Ordem;
             var retorno = scope.ServiceProvider.GetRequiredService<IProdutoCategoriaRepository>().InserirEditar(objeto);
 
             await Js.InvokeVoidAsync("notifica", retorno.Sucesso ? "" : "Erro", retorno.Mensagem, retorno.Sucesso);
             if (retorno.Sucesso)
             {
                 DialogService.Close();
-                await dataGridProduto.Reset();
+                await dataGridProduto.ResetCategoria();
             }
         }
 

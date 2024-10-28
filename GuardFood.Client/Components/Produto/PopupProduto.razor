@@ -16,7 +16,6 @@
                 <RadzenColumn Size="12" SizeMD="12">
                     <RadzenLabel Text="Descrição" />
                     <RadzenTextBox Name="Descricao" @bind-Value=@produto.Descricao Style="display: block; width: 100%" MaxLength="100" AutoComplete="false" />
-                    <RadzenRequiredValidator Component="Descricao" Text="Descrição é de Preenchimento Obrigatório" Popup="true" Style="position: absolute" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
@@ -39,6 +38,9 @@
 @code {
 
     [Parameter]
+    public ProdutoCategoria categoria { get; set; }
+
+    [Parameter]
     public DataGridProduto dataGridProduto { get; set; }
 
     [Parameter]
@@ -46,6 +48,9 @@
 
     [Parameter]
     public bool editar { get; set; } = false;
+
+    [Parameter]
+    public int? ordem { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,13 +61,16 @@
     {
         using (var scope = ScopeFactory.CreateScope())
         {
+            produto.ProdutoCategoriaId = categoria.Id;
+            produto.RestauranteId = categoria.RestauranteId;
+            produto.Ordem = ordem ?? produto.Ordem;
             var retorno = scope.ServiceProvider.GetRequiredService<IProdutoRepository>().InserirEditar(produto);
 
             await Js.InvokeVoidAsync("notifica", retorno.Sucesso ? "" : "Erro", retorno.Mensagem, retorno.Sucesso);
             if (retorno.Sucesso)
             {
                 DialogService.Close();
-                await dataGridProduto.Reset();
+                await dataGridProduto.ResetProduto(categoria);
             }
         }
 

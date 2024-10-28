@@ -14,6 +14,6 @@ namespace GuardFood.Core.Entities
         public string Nome { get; set; }
 
         [NotMapped]
-        public List<Produto> Produtos { get; set; }
+        public List<Produto> Produtos { get; set; } = new List<Produto>();
     }
 }

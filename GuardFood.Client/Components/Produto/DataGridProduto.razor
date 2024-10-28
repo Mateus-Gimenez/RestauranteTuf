@@ -13,46 +13,43 @@
     </RadzenBreadCrumb>
 </RadzenStack>
 
-<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="true" FilterMode="FilterMode.Simple" AllowSorting="true" EmptyText="Nenhum Registro Encontrado!"
-                IsLoading=@isLoading LoadData="@LoadDataCategoria" Data="@categorias" TItem="ProdutoCategoria" ColumnWidth="300px" Responsive="true" LogicalFilterOperator="LogicalFilterOperator.And" Style="margin-top: 1.5rem; max-height: calc(100vh - 13rem)">
+<RadzenDataGrid @ref="gridCategoria" AllowFiltering="false" AllowColumnResize="true" AllowAlternatingRows="true" FilterMode="FilterMode.Simple" AllowSorting="false" EmptyText="Nenhum Registro Encontrado!" RowExpand="RowExpand"
+                IsLoading=@isLoading LoadData="@LoadDataCategoria" Data="@categorias" TItem="ProdutoCategoria" Responsive="true" LogicalFilterOperator="LogicalFilterOperator.And" Style="margin-top: 1.5rem; max-height: calc(100vh - 13rem)">
     <HeaderTemplate>
         <RadzenButton Text="Adicionar Categoria" Click=@(() => ExibePopupProdutoCategoria()) />
     </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn TItem="ProdutoCategoria" Property="Ordem" Title="Ordem" />
-        <RadzenDataGridColumn TItem="ProdutoCategoria" Property="Nome" Title="Nome" Filterable="true" Sortable="true" FilterOperator="FilterOperator.StartsWith">
-            <FooterTemplate>
-                <b>@count</b> Registros
-            </FooterTemplate>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ProdutoCategoria" Property="Inclusao" Title="Dt. Inclusão" SortOrder="SortOrder.Descending" />
+        <RadzenDataGridColumn TItem="ProdutoCategoria" Property="Nome" Title="Nome" />
+        <RadzenDataGridColumn TItem="ProdutoCategoria" Property="Inclusao" Title="Dt. Inclusão" />
         <RadzenDataGridColumn TItem="ProdutoCategoria" Property="Alteracao" Title="Dt. Alteração" />
-        <RadzenDataGridColumn TItem="ProdutoCategoria" Context="Id" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" Width="100px" FrozenPosition="FrozenColumnPosition.Right">
+        <RadzenDataGridColumn TItem="ProdutoCategoria" Context="Id" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
             <Template Context="Id">
+                <RadzenButton Visible="@(categorias.IndexOf(Id) != 0)" ButtonStyle="ButtonStyle.Light" Icon="arrow_upward" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Click="(args => MoveAcimaCategoria(Id))" title="Mover para Cima" />
+                <RadzenButton Visible="@(categorias.IndexOf(Id) + 1 != categorias.Count)" ButtonStyle="ButtonStyle.Light" Icon="arrow_downward" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Click="(args => MoveAbaixoCategoria(Id))" title="Mover para Baixo" />
                 <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="edit" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="(args => ExibePopupEditarProdutoCategoria(Id))" title="Editar" />
                 <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Click="(args => DeleteProdutoCategoria(Id))" class="my-1 ms-1" title="Remover" />
             </Template>
         </RadzenDataGridColumn>
     </Columns>
     <Template Context="categoria">
-        <RadzenDataGrid @ref="gridProduto" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="true" FilterMode="FilterMode.Simple" AllowSorting="true" EmptyText="Nenhum Registro Encontrado!"
-                        IsLoading=@isLoading LoadData="@LoadDataProduto" Data="@produtos" TItem="Produto" ColumnWidth="300px" Responsive="true" LogicalFilterOperator="LogicalFilterOperator.And" Style="margin-top: 1.5rem; max-height: calc(100vh - 13rem)">
+        <RadzenDataGrid AllowFiltering="false" AllowColumnResize="true" AllowAlternatingRows="true" FilterMode="FilterMode.Simple" AllowSorting="false" EmptyText="Nenhum Registro Encontrado!"
+                        IsLoading=@isLoading Data="@categoria.Produtos" TItem="Produto" Responsive="true" LogicalFilterOperator="LogicalFilterOperator.And" Style="margin-top: 1.5rem; max-height: calc(100vh - 13rem)">
             <HeaderTemplate>
-                <RadzenButton Text="Adicionar Produto" Click=@(() => ExibePopupProduto()) />
+                <RadzenButton Text="Adicionar Produto" Click=@(() => ExibePopupProduto(categoria)) />
             </HeaderTemplate>
             <Columns>
-                <RadzenDataGridColumn TItem="Produto" Property="Nome" Title="Nome" Filterable="true" Sortable="true" FilterOperator="FilterOperator.StartsWith">
-                    <FooterTemplate>
-                        <b>@count</b> Registros
-                    </FooterTemplate>
-                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="Produto" Property="Ordem" Title="Ordem" />
+                <RadzenDataGridColumn TItem="Produto" Property="Nome" Title="Nome" Filterable="true" Sortable="true" />
                 <RadzenDataGridColumn TItem="Produto" Property="Descricao" Title="Descrição" />
                 <RadzenDataGridColumn TItem="Produto" Property="ValorMonetario" Title="Valor" />
-                <RadzenDataGridColumn TItem="Produto" Property="Inclusao" Title="Dt. Inclusão" SortOrder="SortOrder.Descending" />
+                <RadzenDataGridColumn TItem="Produto" Property="Inclusao" Title="Dt. Inclusão" />
                 <RadzenDataGridColumn TItem="Produto" Property="Alteracao" Title="Dt. Alteração" />
-                <RadzenDataGridColumn TItem="Produto" Context="Id" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" Width="100px" FrozenPosition="FrozenColumnPosition.Right">
+                <RadzenDataGridColumn TItem="Produto" Context="Id" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
                     <Template Context="Id">
-                        <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="edit" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="(args => ExibePopupEditarProduto(Id))" title="Editar" />
+                        <RadzenButton Visible="@(categoria.Produtos.IndexOf(Id) != 0)" ButtonStyle="ButtonStyle.Light" Icon="arrow_upward" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Click="(args => MoveAcimaProduto(Id))" title="Mover para Cima" />
+                        <RadzenButton Visible="@(categoria.Produtos.IndexOf(Id) + 1 != categoria.Produtos.Count)" ButtonStyle="ButtonStyle.Light" Icon="arrow_downward" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Click="(args => MoveAbaixoProduto(Id))" title="Mover para Baixo" />
+                        <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="edit" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="(args => ExibePopupEditarProduto(Id, categoria))" title="Editar" />
                         <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Click="(args => DeleteProduto(Id))" class="my-1 ms-1" title="Remover" />
                     </Template>
                 </RadzenDataGridColumn>
@@ -68,50 +65,56 @@
     public Guid restauranteId { get; set; }
 
     // Produto
-    RadzenDataGrid<Produto> gridProduto;
     IEnumerable<Produto> produtos;
-    int count;
     bool isLoading = false;
 
     // Categoria
     RadzenDataGrid<ProdutoCategoria> gridCategoria;
-    IEnumerable<ProdutoCategoria> categorias;
+    List<ProdutoCategoria> categorias;
 
-    async void ExibePopupProduto()
+    async void ExibePopupProduto(ProdutoCategoria categoria)
     {
-        await DialogService.OpenAsync<PopupProduto>("Adicionar Produto", new Dictionary<string, object>() { { "dataGridProduto", this }, { "restauranteId", restauranteId } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
+        await DialogService.OpenAsync<PopupProduto>("Adicionar Produto", new Dictionary<string, object>() { { "dataGridProduto", this }, { "categoria", categoria }, { "ordem", categoria.Produtos.Count + 1 } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
     }
 
-    async Task ExibePopupEditarProduto(Produto produto)
+    async Task ExibePopupEditarProduto(Produto produto, ProdutoCategoria categoria)
     {
-        await DialogService.OpenAsync<PopupProduto>("Editar Produto", new Dictionary<string, object>() { { "dataGridProduto", this }, { "editar", true }, { "Produto", produto }, { "restauranteId", restauranteId } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
+        var editarProduto = new Produto();
+        JsonConvert.PopulateObject(JsonConvert.SerializeObject(produto), editarProduto);
+        await DialogService.OpenAsync<PopupProduto>("Editar Produto", new Dictionary<string, object>() { { "dataGridProduto", this }, { "editar", true }, { "Produto", editarProduto }, { "categoria", categoria } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
     }
 
     async void ExibePopupProdutoCategoria()
     {
-        await DialogService.OpenAsync<PopupProdutoCategoria>("Adicionar Categoria", new Dictionary<string, object>() { { "dataGridProduto", this }, { "restauranteId", restauranteId } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
+        await DialogService.OpenAsync<PopupProdutoCategoria>("Adicionar Categoria", new Dictionary<string, object>() { { "dataGridProduto", this }, { "restauranteId", restauranteId }, { "ordem", categorias.Count + 1 } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
     }
 
     async Task ExibePopupEditarProdutoCategoria(ProdutoCategoria produtoCategoria)
     {
-        await DialogService.OpenAsync<PopupProdutoCategoria>("Editar Categoria", new Dictionary<string, object>() { { "dataGridProduto", this }, { "editar", true }, { "Produto", produtoCategoria }, { "restauranteId", restauranteId } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
+        var editarCategoria = new ProdutoCategoria();
+        JsonConvert.PopulateObject(JsonConvert.SerializeObject(produtoCategoria), editarCategoria);
+        await DialogService.OpenAsync<PopupProdutoCategoria>("Editar Categoria", new Dictionary<string, object>() { { "dataGridProduto", this }, { "editar", true }, { "categoria", editarCategoria }, { "restauranteId", restauranteId } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
     }
 
     void RowExpand(ProdutoCategoria categoria)
     {
-        if (categoria.Produtos == null)
+        using (var scope = scopeFactory.CreateScope())
         {
-            using(var scope = scopeFactory.CreateScope())
-            {
-                categoria.Produtos = scope.ServiceProvider.GetRequiredService<IProdutoRepository>().GetByCategoriaId(categoria.Id).ToList();
-            }
+            categoria.Produtos = scope.ServiceProvider.GetRequiredService<IProdutoRepository>().GetByCategoriaId(categoria.Id).ToList();
         }
     }
 
-    public async Task Reset()
+    public async Task ResetProduto(ProdutoCategoria categoria)
     {
-        gridProduto.Reset(true);
-        await gridProduto.FirstPage(true);
+        var expandeCategoria = categorias.FirstOrDefault(f => f.Id == categoria.Id);
+        await gridCategoria.ExpandRow(expandeCategoria);
+        await gridCategoria.ExpandRow(expandeCategoria);
+    }
+
+    public async Task ResetCategoria()
+    {
+        gridCategoria.Reset(true);
+        await gridCategoria.FirstPage(true);
     }
 
     async Task DeleteProduto(Produto produto)
@@ -121,9 +124,11 @@
         {
             using (var scope = scopeFactory.CreateScope())
             {
-                scope.ServiceProvider.GetRequiredService<IProdutoRepository>().Deletar(produto.Id);
+                var retorno = scope.ServiceProvider.GetRequiredService<IProdutoRepository>().Deletar(produto.Id);
+                await JsRuntime.InvokeVoidAsync("notifica", retorno.Sucesso ? "" : "Erro", retorno.Mensagem, retorno.Sucesso);
+                scope.ServiceProvider.GetRequiredService<IProdutoRepository>().Reordenar(produto.ProdutoCategoriaId);
             }
-            await Reset();
+            await ResetProduto(categorias.FirstOrDefault(f => f.Id == produto.ProdutoCategoriaId));
         }
     }
 
@@ -134,43 +139,12 @@
         {
             using (var scope = scopeFactory.CreateScope())
             {
-                scope.ServiceProvider.GetRequiredService<IProdutoCategoriaRepository>().Deletar(categoria.Id);
+                var retorno = scope.ServiceProvider.GetRequiredService<IProdutoCategoriaRepository>().Deletar(categoria.Id);
+                await JsRuntime.InvokeVoidAsync("notifica", retorno.Sucesso ? "" : "Erro", retorno.Mensagem, retorno.Sucesso);
+                scope.ServiceProvider.GetRequiredService<IProdutoCategoriaRepository>().Reordenar(categoria.RestauranteId);
             }
-            await Reset();
+            await ResetCategoria();
         }
-    }
-
-    async Task LoadDataProduto(LoadDataArgs args)
-    {
-        isLoading = true;
-
-        await Task.Yield();
-
-        var query = new List<Produto>().AsEnumerable();
-        using(var scope = scopeFactory.CreateScope())
-        {
-            query = scope.ServiceProvider.GetRequiredService<IProdutoRepository>().BuscarTodosPorRestauranteId(restauranteId).AsEnumerable();
-        }
-
-        if (!string.IsNullOrEmpty(args.Filter))
-        {
-            query = query.AsQueryable().Where(args.Filter).AsEnumerable();
-        }
-
-        if (args.Sorts.Any())
-        {
-            foreach (var s in args.Sorts)
-            {
-                var propertyInfo = typeof(Produto).GetProperty(s.Property);
-                query = s.SortOrder == SortOrder.Ascending ? query.OrderBy(o => propertyInfo.GetValue(o, null)) : query.OrderByDescending(o => propertyInfo.GetValue(o, null));
-            }
-        }
-
-        count = query.Count();
-
-        produtos = query.ToList();
-
-        isLoading = false;
     }
 
     async Task LoadDataCategoria(LoadDataArgs args)
@@ -182,7 +156,7 @@
         var query = new List<ProdutoCategoria>().AsEnumerable();
         using (var scope = scopeFactory.CreateScope())
         {
-            query = scope.ServiceProvider.GetRequiredService<IProdutoCategoriaRepository>().BuscarTodosPorRestauranteId(restauranteId).AsEnumerable();
+            query = scope.ServiceProvider.GetRequiredService<IProdutoCategoriaRepository>().BuscarTodosPorRestauranteId(restauranteId).OrderBy(o => o.Ordem).AsEnumerable();
         }
 
         if (!string.IsNullOrEmpty(args.Filter))
@@ -199,11 +173,84 @@
             }
         }
 
-        count = query.Count();
-
         categorias = query.ToList();
 
         isLoading = false;
+    }
+
+    async Task MoveAcimaProduto(Produto produtoAtual)
+    {
+        var categoria = categorias.First(f => f.Id == produtoAtual.ProdutoCategoriaId);
+        var listaProdutos = categoria.Produtos;
+
+        var ordem = listaProdutos.IndexOf(produtoAtual);
+        var produtoAbaixo = listaProdutos[ordem - 1];
+
+        produtoAtual.Ordem = (ordem + 1) - 1;
+        produtoAbaixo.Ordem = (ordem + 1);
+
+        using (var scope = scopeFactory.CreateScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IProdutoRepository>().InserirEditar(produtoAtual);
+            scope.ServiceProvider.GetRequiredService<IProdutoRepository>().InserirEditar(produtoAbaixo);
+
+            await ResetProduto(categoria);
+        }
+    }
+
+    async Task MoveAbaixoProduto(Produto produtoAtual)
+    {
+        var categoria = categorias.First(f => f.Id == produtoAtual.ProdutoCategoriaId);
+        var listaProdutos = categoria.Produtos;
+
+        var ordem = listaProdutos.IndexOf(produtoAtual);
+        var produtoAbaixo = listaProdutos[ordem + 1];
+
+        produtoAtual.Ordem = (ordem + 1) + 1;
+        produtoAbaixo.Ordem = (ordem + 1);
+
+        using (var scope = scopeFactory.CreateScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IProdutoRepository>().InserirEditar(produtoAtual);
+            scope.ServiceProvider.GetRequiredService<IProdutoRepository>().InserirEditar(produtoAbaixo);
+
+            await ResetProduto(categoria);
+        }
+
+    }
+
+    async Task MoveAcimaCategoria(ProdutoCategoria categoriaAtual)
+    {
+        var ordem = categorias.IndexOf(categoriaAtual);
+        var categoriaAcima = categorias[ordem - 1];
+
+        categoriaAtual.Ordem = (ordem + 1) - 1;
+        categoriaAcima.Ordem = (ordem + 1);
+
+        using (var scope = scopeFactory.CreateScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IProdutoCategoriaRepository>().InserirEditar(categoriaAtual);
+            scope.ServiceProvider.GetRequiredService<IProdutoCategoriaRepository>().InserirEditar(categoriaAcima);
+
+            await ResetCategoria();
+        }
+    }
+
+    async Task MoveAbaixoCategoria(ProdutoCategoria categoriaAtual)
+    {
+        var ordem = categorias.IndexOf(categoriaAtual);
+        var categoriaAbaixo = categorias[ordem + 1];
+
+        categoriaAtual.Ordem = (ordem + 1) + 1;
+        categoriaAbaixo.Ordem = (ordem + 1);
+
+        using (var scope = scopeFactory.CreateScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IProdutoCategoriaRepository>().InserirEditar(categoriaAtual);
+            scope.ServiceProvider.GetRequiredService<IProdutoCategoriaRepository>().InserirEditar(categoriaAbaixo);
+
+            await ResetCategoria();
+        }
     }
 
 }

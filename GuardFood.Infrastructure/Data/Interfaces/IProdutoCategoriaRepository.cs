@@ -9,5 +9,6 @@ namespace GuardFood.Core.Data.Interfaces
 {
     public interface IProdutoCategoriaRepository : IRepository<ProdutoCategoria>
     {
+        void Reordenar(Guid restauranteId);
     }
 }
