@@ -5,6 +5,7 @@ using GuardFood.Core.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace GuardFood.Client.Controllers
 {
@@ -109,6 +110,42 @@ namespace GuardFood.Client.Controllers
                     Sucesso = false,
                     Mensagem = e.Message
                 };
+            }
+        }
+
+        [HttpPost]
+        public RetornoViewModel PostRestauranteUsuario(string values)
+        {
+            try
+            {
+                var model = new FormCadastroViewModel();
+                JsonConvert.PopulateObject(values, model);
+
+                var restaurate = new Restaurante()
+                {
+                    Nome = model.Restaurante.Nome,
+                    Telefone = model.Restaurante.Telefone,
+                    Endereco = model.Restaurante.Endereco
+                };
+
+                var usuario = new Usuario()
+                {
+                    Nome = model.Usuario.Nome,
+                    UserName = model.Usuario.Email,
+                    Email = model.Usuario.Email,
+                    RestauranteId = restaurate.Id
+                };
+
+                _restauranteRepository.InsertOrReplace(restaurate);
+                var retorno = _userManager.CreateAsync(usuario, model.Usuario.Senha).Result;
+                if (retorno.Errors.Any()) throw new Exception(string.Join(", ", retorno.Errors));
+
+
+                return new RetornoViewModel { Sucesso = true, Mensagem = "Cadastro realizado com sucesso" };
+            }
+            catch(Exception e)
+            {
+                return new RetornoViewModel { Sucesso = false, Mensagem = e.Message };
             }
         }
 

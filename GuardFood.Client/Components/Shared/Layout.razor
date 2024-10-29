@@ -18,11 +18,12 @@
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                     <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+                    <RadzenLabel Text="@restaurante?.Nome" />
                 </RadzenStack>
                 <RadzenStack>
                     <RadzenProfileMenu>
                         <Template>
-                            <RadzenLabel Text="@(usuario?.UserName)" Style="margin-right: 0.5rem" />
+                            <RadzenLabel Text="@(usuario?.Nome?.Split(" ")?.First())" Style="margin-right: 0.5rem" />
                             <RadzenGravatar Email="@(usuario?.Email)" />
                         </Template>
                         <ChildContent>
@@ -30,12 +31,12 @@
                             <div @onclick="exibePopupTrocaSenha">
                                 <RadzenProfileMenuItem Text="Trocar Senha" Icon="lock_reset"></RadzenProfileMenuItem>
                             </div>
-                            <div @onclick="temaClaro">
+                            @*<div @onclick="temaClaro">
                                 <RadzenProfileMenuItem Visible="!LightMode" Text="Modo Claro" Icon="light_mode"></RadzenProfileMenuItem>
                             </div>
                             <div @onclick="temaEscuro">
                                 <RadzenProfileMenuItem Visible="LightMode" Text="Modo Escuro" Icon="dark_mode" @onclick="temaEscuro"></RadzenProfileMenuItem>
-                            </div>
+                            </div>*@
                             <div onclick="sairSistema()">
                                 <RadzenProfileMenuItem Text="Sair" Icon="logout"></RadzenProfileMenuItem>
                             </div>
@@ -78,6 +79,9 @@
 
     [Parameter]
     public Usuario usuario { get; set; } = null;
+
+    [Parameter]
+    public Restaurante restaurante { get; set; }
 
     [Parameter]
     public bool LightMode { get; set; }

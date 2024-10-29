@@ -1,7 +1,9 @@
 ﻿@inject Microsoft.AspNetCore.Identity.UserManager<Usuario> userManager;
+@inject GuardFood.Core.Data.Interfaces.IRestauranteRepository restauranteRepository;
 
 @{
     var usuario = userManager.GetUserAsync(User).Result;
+    var restaurante = usuario != null ? restauranteRepository.GetById(usuario.RestauranteId) : null;
     var titulo = string.IsNullOrEmpty(ViewBag.Title) ? "GuardFood" : ViewBag.Title + " :: GuardFood";
     var lightMode = bool.Parse(Context.Request.Cookies["lightMode"] ?? "false");
 }
@@ -32,7 +34,7 @@
 </head>
 <body>
 
-    <component type="typeof(GuardFood.Client.Components.Shared.Layout)" render-mode="Server" param-LightMode="lightMode" param-usuario="usuario" />
+    <component type="typeof(GuardFood.Client.Components.Shared.Layout)" render-mode="Server" param-LightMode="lightMode" param-usuario="usuario" param-restaurante="restaurante" />
     <div class="container d-none">
         @RenderBody()
     </div>

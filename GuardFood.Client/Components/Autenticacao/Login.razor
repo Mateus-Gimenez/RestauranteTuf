@@ -2,69 +2,69 @@
 @inject HttpClient httpClient;
 @inject NotificationService notificationService;
 
-    <style>
+<style>
 
-        .rz-login-buttons .rz-button {
-            width: 100%;
+    .rz-login-buttons .rz-button {
+        width: 100%;
+    }
+
+    i {
+        /* Replace this with your icon styling */
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        color: var(--rz-primary);
+        font-size: 24px;
+        line-height: 50px;
+        border-radius: 50%;
+    }
+
+    .or {
+        position: relative;
+        height: 2.2rem;
+        line-height: 50px;
+        text-align: center;
+    }
+
+        .or::before,
+        .or::after {
+            position: absolute;
+            width: 40%;
+            height: 1px;
+            top: 24px;
+            background-color: #aaa;
+            content: '';
         }
 
-        i {
-            /* Replace this with your icon styling */
-            display: inline-block;
-            width: 50px;
-            height: 50px;
-            color: var(--rz-primary);
-            font-size: 24px;
-            line-height: 50px;
-            border-radius: 50%;
+        .or::before {
+            left: 0;
         }
 
-        .or {
-            position: relative;
-            height: 2.2rem;
-            line-height: 50px;
-            text-align: center;
+        .or::after {
+            right: 0;
         }
 
-            .or::before,
-            .or::after {
-                position: absolute;
-                width: 40%;
-                height: 1px;
-                top: 24px;
-                background-color: #aaa;
-                content: '';
-            }
+    .button-secondary {
+        background: white !important;
+        width: 100% !important;
+        color: grey !important;
+        box-shadow: none !important;
+        border: 1px solid black;
+        border-radius: 28px !important;
+        margin-top: 1rem
+    }
 
-            .or::before {
-                left: 0;
-            }
-
-            .or::after {
-                right: 0;
-            }
-
-        .button-secondary {
-            background: white !important;
-            width: 100% !important;
-            color: grey !important;
-            box-shadow: none !important;
-            border: 1px solid black;
-            border-radius: 28px !important;
-            margin-top: 1rem
+        .button-secondary:hover {
+            background: #dddddd !important;
+            border: 1.5px solid black
         }
 
-            .button-secondary:hover {
-                background: #dddddd !important;
-                border: 1.5px solid black
-            }
-
-        @@media only screen and (max-width: 600px) {
-            .rz-mob {
-                width: 100% !important
-            }
+    @@media only screen and (max-width: 600px) {
+        .rz-mob {
+            width: 100% !important
         }
-    </style>
+    }
+</style>
 
 <RadzenColumn JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0" Class="rz-my-12 rz-mx-auto rz-border-radius-6 rz-shadow-10 rz-mob" Style="background:white;width: 30%; max-width: 90vw; height: auto; overflow: hidden; margin: 0">
     <RadzenColumn JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Style="background: white; padding-top:1rem">
