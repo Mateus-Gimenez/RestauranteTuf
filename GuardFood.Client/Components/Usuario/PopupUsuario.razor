@@ -1,0 +1,83 @@
+﻿@inject IJSRuntime Js;
+@inject DialogService DialogService;
+@inject IServiceScopeFactory ScopeFactory;
+
+<RadzenTemplateForm TItem="Usuario" Data=@objeto Submit=@OnSubmit>
+    <RadzenFieldset Text="">
+        <RadzenStack Gap="1rem" Class="rz-p-4 rz-p-md-12" Style="padding: 0 !important">
+            <RadzenFormField Text="Nome" Variant="Variant.Outlined">
+                <ChildContent>
+                    <RadzenTextBox Name="UsuarioNome" @bind-Value="@objeto.Nome" />
+                    <RadzenRequiredValidator Component="UsuarioNome" Text="Nome é obrigatório" Popup="true" Style="position: absolute" />
+                </ChildContent>
+            </RadzenFormField>
+            <RadzenFormField Text="E-mail" Variant="Variant.Outlined">
+                <ChildContent>
+                    <RadzenTextBox Name="Email" @bind-Value="@objeto.Email" AutoCompleteType="AutoCompleteType.Off" />
+                    <RadzenRequiredValidator Component="Email" Text="E-mail é obrigatório" Popup="true" Style="position: absolute" />
+                </ChildContent>
+            </RadzenFormField>
+            <RadzenRow AlignItems="AlignItems.Center" Class="rz-mt-4">
+                <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
+                    <RadzenButton ButtonType="ButtonType.Submit" Text="@(editar ? "Editar" : "Adicionar")"></RadzenButton>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </RadzenFieldset>
+</RadzenTemplateForm>
+
+
+@code {
+
+    [Parameter]
+    public Guid restauranteId { get; set; }
+
+    [Parameter]
+    public DataGridUsuario dataGridUsuario { get; set; }
+
+    [Parameter]
+    public Usuario objeto { get; set; } = new Usuario();
+
+    [Parameter]
+    public bool editar { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    async void OnSubmit(Usuario objeto)
+    {
+        using (var scope = ScopeFactory.CreateScope())
+        {
+            objeto.RestauranteId = objeto.RestauranteId == Guid.Empty ? restauranteId : objeto.RestauranteId;
+            objeto.Tipo = Usuario.TipoUsuario.Funcionario;
+
+            var retorno = new RetornoViewModel();
+
+            if (!editar)
+            {
+                var result = await scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<Usuario>>().CreateAsync(objeto, "");
+                if (result.Succeeded)
+                {
+                    retorno = new RetornoViewModel() { Sucesso = true, Mensagem = "Funcionário inserido com sucesso" };
+                }
+                else
+                {
+                    retorno = new RetornoViewModel() { Sucesso = false, Mensagem = string.Join(", ", result.Errors) };
+                }
+            }
+            else
+            {
+                retorno = scope.ServiceProvider.GetRequiredService<IUsuarioRepository>().InsertOrReplace(objeto);
+            }
+
+            await Js.InvokeVoidAsync("notifica", retorno.Sucesso ? "" : "Erro", retorno.Mensagem, retorno.Sucesso);
+            if (retorno.Sucesso)
+            {
+                DialogService.Close();
+                await dataGridUsuario.Reset();
+            }
+        }
+    }
+}

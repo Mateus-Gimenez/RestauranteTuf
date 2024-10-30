@@ -1,4 +1,5 @@
-﻿using GuardFood.Core.Data.ViewModel;
+﻿using GuardFood.Core.Data.Interfaces;
+using GuardFood.Core.Data.ViewModel;
 using GuardFood.Core.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -11,12 +12,12 @@ namespace GuardFood.Client.Controllers
     public class HomeController : Controller
     {
         private readonly UserManager<Usuario> _userManager;
-        private readonly ILogger<HomeController> _logger;
+        private readonly IRestauranteRepository _restauranteRepository;
 
-        public HomeController(UserManager<Usuario> userManager, ILogger<HomeController> logger)
+        public HomeController(UserManager<Usuario> userManager, IRestauranteRepository restauranteRepository)
         {
             _userManager = userManager;
-            _logger = logger;
+            _restauranteRepository = restauranteRepository;
         }
 
         [AllowAnonymous]
@@ -29,6 +30,20 @@ namespace GuardFood.Client.Controllers
         {
             ViewData["RestauranteId"] = _userManager.GetUserAsync(User).Result.RestauranteId;
             return View();
+        }
+
+        [Route("/Usuario")]
+        public IActionResult Usuario()
+        {
+            ViewData["RestauranteId"] = _userManager.GetUserAsync(User).Result.RestauranteId;
+            return View("~/Views/Usuario/Index.cshtml");
+        }
+
+        [Route("/Restaurante/Configuracoes")]
+        public IActionResult RestauranteConfiguracoes()
+        {
+            var restaurante = _restauranteRepository.GetById(_userManager.GetUserAsync(User).Result.RestauranteId);
+            return View("~/Views/Restaurante/Configuracoes.cshtml", restaurante);
         }
 
         public IActionResult Privacy()

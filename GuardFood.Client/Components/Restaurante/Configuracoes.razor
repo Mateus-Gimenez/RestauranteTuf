@@ -1,0 +1,23 @@
+﻿@using System.Linq.Dynamic.Core;
+@inject IJSRuntime JsRuntime;
+@inject DialogService DialogService;
+@inject IServiceScopeFactory scopeFactory;
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+    <RadzenLabel><h4>Config. Restaurante</h4></RadzenLabel>
+    <RadzenBreadCrumb>
+        <RadzenBreadCrumbItem Path="/Home/Dashboard" Text="Home" Icon="home" />
+        <RadzenBreadCrumbItem Text="Config. Restaurante" Icon="settings" />
+    </RadzenBreadCrumb>
+</RadzenStack>
+
+<RadzenCard>
+    <RadzenStack>
+
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+    [Parameter]
+    public Restaurante restaurante { get; set; }
+}

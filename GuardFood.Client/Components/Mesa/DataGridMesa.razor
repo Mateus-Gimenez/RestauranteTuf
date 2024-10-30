@@ -95,7 +95,7 @@
         {
             foreach (var s in args.Sorts)
             {
-                var propertyInfo = typeof(Produto).GetProperty(s.Property);
+                var propertyInfo = typeof(Mesa).GetProperty(s.Property);
                 query = s.SortOrder == SortOrder.Ascending ? query.OrderBy(o => propertyInfo.GetValue(o, null)) : query.OrderByDescending(o => propertyInfo.GetValue(o, null));
             }
         }

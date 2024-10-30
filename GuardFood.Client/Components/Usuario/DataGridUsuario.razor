@@ -1,0 +1,130 @@
+﻿@using System.Linq.Dynamic.Core;
+@inject IJSRuntime JsRuntime;
+@inject DialogService DialogService;
+@inject IServiceScopeFactory scopeFactory;
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+    <RadzenLabel><h4>Usuários</h4></RadzenLabel>
+    <RadzenBreadCrumb>
+        <RadzenBreadCrumbItem Path="/Home/Dashboard" Text="Home" Icon="home" />
+        <RadzenBreadCrumbItem Text="Usuários" Icon="account_box" />
+    </RadzenBreadCrumb>
+</RadzenStack>
+
+<RadzenLabel Style="margin-top: 2.5rem"><h6>Master</h6></RadzenLabel>
+<RadzenDataGrid Data="@master" TItem="Usuario">
+    <Columns>
+        <RadzenDataGridColumn TItem="Usuario" Property="Nome" Title="Nome" FilterOperator="FilterOperator.StartsWith" />
+        <RadzenDataGridColumn TItem="Usuario" Property="Email" Title="E-mail" FilterOperator="FilterOperator.StartsWith" />
+        <RadzenDataGridColumn TItem="Usuario" Property="Inclusao" Title="Dt. Inclusão" />
+
+    </Columns>
+</RadzenDataGrid>
+
+<RadzenLabel Style="margin-top: 2.5rem"><h6>Funcionários</h6></RadzenLabel>
+<RadzenDataGrid Data="@funcionarios" @ref="gridFuncionarios" LoadData="@LoadDataMesa">
+    <HeaderTemplate>
+        <RadzenButton Text="Adicionar Funcionário" Click=@(() => ExibePopupUsuario()) />
+    </HeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn TItem="Usuario" Property="Nome" Title="Nome" FilterOperator="FilterOperator.StartsWith">
+            <FooterTemplate>
+                <b>@count</b> Registros
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Usuario" Property="Email" Title="E-mail" FilterOperator="FilterOperator.StartsWith" />
+        <RadzenDataGridColumn TItem="Usuario" Property="Inclusao" Title="Dt. Inclusão" />
+        <RadzenDataGridColumn TItem="Usuario" Context="Id" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" Width="100px" FrozenPosition="FrozenColumnPosition.Right">
+            <Template Context="Id">
+                <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="edit" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="(args => ExibePopupEditarUsuario(Id))" title="Editar" />
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Click="(args => DeleteUsuario(Id))" class="my-1 ms-1" title="Remover" />
+            </Template>
+        </RadzenDataGridColumn>
+
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+
+    [Parameter]
+    public Guid restauranteId { get; set; }
+
+    RadzenDataGrid<Usuario> gridFuncionarios;
+    IEnumerable<Usuario> master;
+    IEnumerable<Usuario> funcionarios;
+    int count;
+    bool isLoading = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        using(var scope = scopeFactory.CreateScope())
+        {
+            master = scope.ServiceProvider.GetRequiredService<IUsuarioRepository>().GetMasterByRestauranteId(restauranteId);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    async void ExibePopupUsuario()
+    {
+        await DialogService.OpenAsync<PopupUsuario>("Adicionar Funcionário", new Dictionary<string, object>() { { "dataGridUsuario", this }, { "restauranteId", restauranteId } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
+    }
+
+    async Task ExibePopupEditarUsuario(Usuario usuario)
+    {
+        var editarObjeto = new Usuario();
+        JsonConvert.PopulateObject(JsonConvert.SerializeObject(usuario), editarObjeto);
+        await DialogService.OpenAsync<PopupUsuario>("Editar Funcionário", new Dictionary<string, object>() { { "dataGridUsuario", this }, { "editar", true }, { "objeto", editarObjeto } }, new DialogOptions() { Width = "450px", Height = "auto", Resizable = false, Draggable = true });
+    }
+
+    async Task DeleteUsuario(Usuario usuario)
+    {
+        var popupConfirma = await DialogService.Confirm($"Deseja mesmo deletar o funcionário {usuario.Nome}?", "Deletar Funcionário", new ConfirmOptions() { OkButtonText = "Sim", CancelButtonText = "Não" });
+        if (popupConfirma == true)
+        {
+            using (var scope = scopeFactory.CreateScope())
+            {
+                scope.ServiceProvider.GetRequiredService<IUsuarioRepository>().Delete(usuario.Id);
+            }
+            await Reset();
+        }
+    }
+
+    public async Task Reset()
+    {
+        gridFuncionarios.Reset(true);
+        await gridFuncionarios.FirstPage(true);
+    }
+
+    async Task LoadDataMesa(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        await Task.Yield();
+
+        var query = new List<Usuario>().AsEnumerable();
+        using (var scope = scopeFactory.CreateScope())
+        {
+            query = scope.ServiceProvider.GetRequiredService<IUsuarioRepository>().GetFuncionariosByRestauranteId(restauranteId).OrderBy(o => o.Nome).AsEnumerable();
+        }
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.AsQueryable().Where(args.Filter).AsEnumerable();
+        }
+
+        if (args.Sorts.Any())
+        {
+            foreach (var s in args.Sorts)
+            {
+                var propertyInfo = typeof(Usuario).GetProperty(s.Property);
+                query = s.SortOrder == SortOrder.Ascending ? query.OrderBy(o => propertyInfo.GetValue(o, null)) : query.OrderByDescending(o => propertyInfo.GetValue(o, null));
+            }
+        }
+
+        count = query.Count();
+
+        funcionarios = query.ToList();
+
+        isLoading = false;
+    }
+}

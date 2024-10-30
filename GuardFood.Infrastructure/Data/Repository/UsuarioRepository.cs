@@ -1,5 +1,6 @@
 ﻿using GuardFood.Core.Context;
 using GuardFood.Core.Data.Interfaces;
+using GuardFood.Core.Data.ViewModel;
 using GuardFood.Core.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -24,6 +25,16 @@ namespace GuardFood.Core.Data.Repository
             return _dbContext.Usuarios.Where(u => u.Ativo).AsEnumerable();
         }
 
+        public IEnumerable<Usuario> GetMasterByRestauranteId(Guid restauranteId)
+        {
+            return _dbContext.Usuarios.Where(u => u.Ativo && u.RestauranteId == restauranteId && u.Tipo == Usuario.TipoUsuario.Master).ToList();
+        }
+
+        public IEnumerable<Usuario> GetFuncionariosByRestauranteId(Guid restauranteId)
+        {
+            return _dbContext.Usuarios.Where(u => u.Ativo && u.RestauranteId == restauranteId && u.Tipo == Usuario.TipoUsuario.Funcionario).ToList();
+        }
+
         public Usuario GetById(string id)
         {
             return _dbContext.Usuarios.SingleOrDefault(t => t.Id == id);
@@ -40,7 +51,7 @@ namespace GuardFood.Core.Data.Repository
             _dbContext.SaveChanges();
         }
 
-        public void InsertOrReplace(Usuario usuario)
+        public RetornoViewModel InsertOrReplace(Usuario usuario)
         {
             try
             {
@@ -69,10 +80,11 @@ namespace GuardFood.Core.Data.Repository
                 }
                 _dbContext.SaveChanges();
 
+                return new RetornoViewModel() { Sucesso = true, Mensagem = "Usuário editado com sucesso" };
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                return new RetornoViewModel() { Sucesso = true, Mensagem = e.Message };
             }
         }
 

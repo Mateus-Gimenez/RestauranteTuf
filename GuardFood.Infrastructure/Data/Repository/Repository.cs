@@ -61,7 +61,6 @@ namespace GuardFood.Core.Data.Repository
         {
             var dados = _context.Set<T>().Where(t => t.Ativo);
 
-
             IQueryable<T> dadosCompletos = null;
 
             foreach (var include in includes)
