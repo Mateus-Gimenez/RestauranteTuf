@@ -7,8 +7,22 @@ namespace GuardFood.Core.Data.Repository
 {
     public class PedidoRepository : Repository<Pedido>, IPedidoRepository
     {
-        public PedidoRepository(GFContext context) : base(context)
+        public PedidoRepository(GFContext context) : base(context) { }
+
+        public RetornoViewModel CancelarPedido(Pedido pedido)
         {
+            try
+            {
+                pedido.Status = Pedido.StatusPedido.Cancelado;
+                _context.Pedidos.Update(pedido).Property(x => x.Codigo).IsModified = false;
+                _context.SaveChanges();
+
+                return new RetornoViewModel() { Sucesso = true };
+            }
+            catch(Exception e)
+            {
+                return new RetornoViewModel() { Sucesso = false, Mensagem = e.Message };
+            }
         }
     }
 }

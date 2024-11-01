@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -33,6 +34,24 @@ namespace GuardFood.Core.Entities
             get
             {
                 return ValorUnitario * Quantidade;
+            }
+        }
+
+        [NotMapped]
+        public string ValorUnitarioFormatado
+        {
+            get
+            {
+                return ValorUnitario.ToString("C", new CultureInfo("pt-BR"));
+            }
+        }
+
+        [NotMapped]
+        public string ValorFormatado
+        {
+            get
+            {
+                return Valor.ToString("C", new CultureInfo("pt-BR"));
             }
         }
     }

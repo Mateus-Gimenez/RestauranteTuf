@@ -1,5 +1,130 @@
-﻿<h3>DataGridPedido</h3>
+﻿@using System.Linq.Dynamic.Core;
+@inject IJSRuntime JsRuntime;
+@inject DialogService DialogService;
+@inject IServiceScopeFactory scopeFactory;
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+    <RadzenLabel><h4>Pedidos</h4></RadzenLabel>
+    <RadzenBreadCrumb>
+        <RadzenBreadCrumbItem Path="/Home/Dashboard" Text="Home" Icon="home" />
+        <RadzenBreadCrumbItem Text="Pedidos" Icon="receipt_long" />
+    </RadzenBreadCrumb>
+</RadzenStack>
+
+<RadzenDropZoneContainer TItem="Pedido" Data="pedidos" ItemRender="@OnItemRender" ItemSelector="@ItemSelector" CanDrop="@CanDrop">
+    <ChildContent>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.NoWrap" class="rz-p-12">
+            <RadzenDropZone Value="Pedido.StatusPedido.Recebido" class="rz-display-flex rz-flex-column rz-background-color-warning-lighter rz-border-warning-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem; overflow-y: scroll; height: calc(100vh - 18rem); min-width: 15rem;">
+                <div>
+                    <div>
+                        <RadzenText Text="Recebido" TextStyle="TextStyle.Subtitle2" />
+                    </div>
+                </div>
+            </RadzenDropZone>
+
+            <RadzenDropZone Value="Pedido.StatusPedido.EmAndamento" class="rz-display-flex rz-flex-column rz-background-color-info-lighter rz-border-info-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem; overflow-y: scroll; height: calc(100vh - 18rem); min-width: 15rem; ">
+                <RadzenText Text="Em Andamento" TextStyle="TextStyle.Subtitle2" />
+            </RadzenDropZone>
+
+            <RadzenDropZone Value="Pedido.StatusPedido.Concluido" class="rz-display-flex rz-flex-column rz-background-color-success-lighter rz-border-success-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem; overflow-y: scroll; height: calc(100vh - 18rem); min-width: 15rem; ">
+                <RadzenText Text="Concluído" TextStyle="TextStyle.Subtitle2" />
+            </RadzenDropZone>
+
+            <RadzenDropZone Value="Pedido.StatusPedido.Cancelado" class="rz-display-flex rz-flex-column rz-background-color-danger-lighter rz-border-danger-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem; overflow-y: scroll; height: calc(100vh - 18rem); min-width: 15rem; ">
+                <RadzenText Text="Cancelado" TextStyle="TextStyle.Subtitle2" />
+            </RadzenDropZone>
+        </RadzenStack>
+    </ChildContent>
+    <Template>
+        <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+            <div>#@context.CodigoFormatado</div>
+            <RadzenButton Icon="search" Text="" Click="() => MostraPopupDetalhePedido(context)" ButtonStyle="ButtonStyle.Warning" />
+        </RadzenStack>
+        @context.NomeCliente<br />
+        Mesa: @context?.Mesa?.Codigo <br />
+        @context.Inclusao.ToString("dd/MM/yyyy HH:mm")
+    </Template>
+</RadzenDropZoneContainer>
 
 @code {
+
+    [Parameter]
+    public Guid restauranteId { get; set; }
+
+    IList<Pedido> pedidos = new List<Pedido>();
+
+    Func<Pedido, RadzenDropZone<Pedido>, bool> ItemSelector = (item, zone) => item.Status == (Pedido.StatusPedido)zone.Value;
+
+    Func<RadzenDropZoneItemEventArgs<Pedido>, bool> CanDrop = request =>
+    {
+        return request.FromZone == request.ToZone || Math.Abs((int)request.Item.Status - (int)request.ToZone.Value) == 1;
+    };
+
+    void OnDrop(RadzenDropZoneItemEventArgs<Pedido> args)
+    {
+
+    }
+
+    async Task MostraPopupDetalhePedido(Pedido pedido)
+    {
+        await DialogService.OpenAsync<PopupPedido>($"Pedido #{pedido.CodigoFormatado}", new Dictionary<string, object>() { { "dataGridPedido", this }, { "pedido", pedido } }, new DialogOptions() { Width = "900px", Height = "auto", Resizable = false, Draggable = true });
+    }
+
+    public void GetPedidos()
+    {
+        using(var scope = scopeFactory.CreateScope())
+        {
+            pedidos = scope.ServiceProvider.GetRequiredService<IPedidoRepository>().BuscarTodosPorRestauranteId(restauranteId, new[] { "Mesa" }).ToList();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        using (var scope = scopeFactory.CreateScope())
+        {
+
+            var mesas = scope.ServiceProvider.GetRequiredService<IMesaRepository>().BuscarTodosPorRestauranteId(restauranteId);
+            var produtos = scope.ServiceProvider.GetRequiredService<IProdutoRepository>().BuscarTodosPorRestauranteId(restauranteId);
+            foreach (var m in mesas)
+            {
+                var pedido = new Pedido()
+                {
+                    RestauranteId = restauranteId,
+                    NomeCliente = "Cliente Teste",
+                    MesaId = m.Id,
+                };
+
+                scope.ServiceProvider.GetRequiredService<IPedidoRepository>().InserirEditar(pedido);
+
+                foreach (var p in produtos)
+                {
+                    var pedidoProduto = new PedidoProduto()
+                    {
+                        NomeProduto = p.Nome,
+                        PedidoId = pedido.Id,
+                        ValorUnitario = p.Valor,
+                        Quantidade = new Random().Next(10),
+                        ProdutoId = p.Id,
+                        Observacao = "Sem sal",
+                        RestauranteId = pedido.RestauranteId,
+                    };
+                    scope.ServiceProvider.GetRequiredService<IPedidoProdutoRepository>().InserirEditar(pedidoProduto);
+                }
+            }
+        }
+
+        GetPedidos();
+    }
+
+    void OnItemRender(RadzenDropZoneItemRenderEventArgs<Pedido> args)
+    {
+        // Customize item appearance
+        args.Attributes["draggable"] = "false";
+        args.Attributes["style"] = "cursor: auto";
+        args.Attributes["class"] = "rz-card rz-variant-filled rz-background-color-primary-light rz-color-on-primary-light";
+
+        // Do not render item if deleted
+        args.Visible = true;
+    }
 
 }
