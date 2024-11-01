@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,20 @@ namespace GuardFood.Core.Entities
         [ForeignKey("Mesa")]
         public Guid MesaId { get; set; }
         public Mesa Mesa { get; set; }
+
+        public StatusPedido Status { get; set; }
+
+        public enum StatusPedido
+        {
+            [Description("Recebido")]
+            Recebido = 0,
+            [Description("Em Andamento")]
+            EmAndamento = 1,
+            [Description("Conclúído")]
+            Concluido = 2,
+            [Description("Cancelado")]
+            Cancelado = 3,
+        }
 
         [NotMapped]
         public string CodigoFormatado
