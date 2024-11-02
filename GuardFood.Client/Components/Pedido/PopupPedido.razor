@@ -31,13 +31,13 @@
 
 @code {
 
-        [Parameter]
-        public Pedido pedido { get; set; }
+    [Parameter]
+    public Pedido pedido { get; set; }
 
-        [Parameter]
-        public DataGridPedido dataGridPedido { get; set; }
+    [Parameter]
+    public DataGridPedido dataGridPedido { get; set; }
 
-        List<PedidoProduto> produtos = new List<PedidoProduto>();
+    List<PedidoProduto> produtos = new List<PedidoProduto>();
 
     protected override async Task OnInitializedAsync()
     {

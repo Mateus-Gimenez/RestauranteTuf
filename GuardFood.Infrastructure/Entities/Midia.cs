@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace GuardFood.Core.Entities
 {
-    [Table("Restaurante")]
-    public class Restaurante
+    [Table("Midia")]
+    public class Midia
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
@@ -18,17 +17,29 @@ namespace GuardFood.Core.Entities
         public DateTime Inclusao { get; set; } = DateTime.Now;
         public DateTime Alteracao { get; set; } = DateTime.Now;
 
-        public string Nome { get; set; }
-        public string Descricao { get; set; }
-        public string Endereco { get; set; }
-        public string Telefone { get; set; }
-        public string Email { get; set; }
-        public string Logo { get; set; }
-        public string CorPrimaria { get; set; }
-        public string CorSecundaria { get; set; }
+        public byte[] Arquivo { get; set; }
 
-        [ForeignKey("Midia")]
-        public Guid? MidiaId { get; set; }
-        public virtual Midia Midia { get; set; }
+        public string Nome { get; set; }
+
+        [NotMapped]
+        public string Url { get; set; }
+
+        [NotMapped]
+        public string Extensao
+        {
+            get
+            {
+                return Path.GetExtension(Nome);
+            }
+        }
+
+        [NotMapped]
+        public string NomeSemExtensao
+        {
+            get
+            {
+                return Path.GetFileNameWithoutExtension(Nome);
+            }
+        }
     }
 }

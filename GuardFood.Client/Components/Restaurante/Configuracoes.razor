@@ -11,13 +11,47 @@
     </RadzenBreadCrumb>
 </RadzenStack>
 
-<RadzenCard>
-    <RadzenStack>
-
-    </RadzenStack>
-</RadzenCard>
+@*<RadzenCard>
+        <RadzenFieldset>
+            <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" RowGap="0.25rem">
+                <RadzenStack Gap="1rem" Class="rz-p-4 rz-p-md-12" Style="padding: 0 !important">
+                    <RadzenColumn Size="12" SizeMD="6" Style="width: 100%; text-align: center;">
+                        <div style="width: 100%">
+                            <RadzenUpload Url="upload/single" Accept="image/*" Icon="photo_camera" ChooseText="" Complete=@CompleteUpload Style="border-radius: 20px; position: relative; left: 4rem; top: 3rem;"></RadzenUpload>
+                        </div>
+                        <RadzenImage Path="@path" class="rz-gravatar icone" Visible="@mostraFoto" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="6" Style="width: 100%; text-align: center;">
+                        <div style="width: 100%">
+                            <RadzenUpload Url="upload/single" Accept="image/*" Icon="photo_camera" ChooseText="" Complete=@CompleteUpload Style="border-radius: 20px; position: relative; left: 4rem; top: 3rem;"></RadzenUpload>
+                        </div>
+                        <RadzenImage Path="@path" class="rz-gravatar icone" Visible="@mostraFoto" />
+                        <RadzenGravatar Email="@(usuario.Email)" class="icone" Visible="@mostraAvatar" />
+                    </RadzenColumn>
+                </RadzenStack>
+            </RadzenRow>
+        </RadzenFieldset>
+</RadzenCard>*@
 
 @code {
     [Parameter]
     public Restaurante restaurante { get; set; }
+
+    public bool mostraFoto { get; set; } = false;
+    public bool mostraAvatar { get; set; } = true;
+
+    public string? path { get; set; } = null;
+    public string? fileName { get; set; } = null;
+    public string? base64 { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        //if (usuario.MidiaId.HasValue)
+        //{
+        //    mostraAvatar = false;
+        //    mostraFoto = true;
+        //    path = $"/Midia/GetMidia?Id={usuario.MidiaId}";
+        //}
+    }
 }

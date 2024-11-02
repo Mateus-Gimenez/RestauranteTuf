@@ -22,6 +22,10 @@ namespace GuardFood.Core.Entities
         public Guid ProdutoCategoriaId { get; set; }
         public virtual ProdutoCategoria ProdutoCategoria { get; set; }
 
+        [ForeignKey("Midia")]
+        public Guid? MidiaId { get; set; }
+        public virtual Midia Midia { get; set; }
+
         [NotMapped]
         public string ValorMonetario
         {
