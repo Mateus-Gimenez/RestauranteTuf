@@ -48,6 +48,7 @@ builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IPedidoProdutoRepository, PedidoProdutoRepository>();
 builder.Services.AddScoped<IRestauranteRepository, RestauranteRepository>();
 builder.Services.AddScoped<IMesaRepository, MesaRepository>();
+builder.Services.AddScoped<IMidiaRepository, MidiaRepository>();
 
 
 var app = builder.Build();
