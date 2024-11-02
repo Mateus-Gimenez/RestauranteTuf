@@ -1,4 +1,5 @@
-﻿using GuardFood.Core.Entities;
+﻿using GuardFood.Core.Data.ViewModel;
+using GuardFood.Core.Entities;
 using GuardFood.Core.Identity;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace GuardFood.Core.Data.Interfaces
     public interface IRestauranteRepository
     {
         Restaurante GetById(Guid restauranteId);
-        void InsertOrReplace(Restaurante restaurante);
+        RetornoViewModel InsertOrReplace(Restaurante restaurante);
         void Delete(Guid Id);
     }
 }

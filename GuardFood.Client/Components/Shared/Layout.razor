@@ -18,7 +18,17 @@
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                     <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
-                    <RadzenLabel Text="@restaurante?.Nome" />
+                    <div @onclick="redirecionaTelaInicial" style="cursor: pointer">
+                        @if (restaurante?.MidiaId == null)
+                        {
+                            <RadzenIcon Icon="restaurant" Style="color: var(--rz-header-color); padding-right: 1rem" />
+                        }
+                        else
+                        {
+                            <RadzenImage Path="@("/Midia/GetMidia?id=" + restaurante.MidiaId)" class="rz-gravatar" Style="margin-right:0.5rem" />
+                        }
+                        <RadzenLabel Text="@restaurante?.Nome" />
+                    </div>
                 </RadzenStack>
                 <RadzenStack>
                     <RadzenProfileMenu>
@@ -115,6 +125,11 @@
     async void redirecionaTela(string detalhe)
     {
         await Js.InvokeVoidAsync("redirecionaTela", detalhe);
+    }
+
+    async void redirecionaTelaInicial()
+    {
+        await Js.InvokeVoidAsync("redirecionaTela", "/");
     }
 
     async void sairSistema()

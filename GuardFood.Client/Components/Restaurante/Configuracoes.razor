@@ -1,7 +1,33 @@
 ﻿@using System.Linq.Dynamic.Core;
-@inject IJSRuntime JsRuntime;
+@inject IJSRuntime JS;
 @inject DialogService DialogService;
 @inject IServiceScopeFactory scopeFactory;
+
+<style>
+    .icone {
+        height: 12rem !important;
+        width: 12rem !important;
+    }
+
+    .rz-fileupload-buttonbar {
+        background-color: transparent;
+    }
+
+    .rz-fileupload-content {
+        display: none !important;
+    }
+
+    .rz-fileupload-choose {
+        background-color: var(--rz-warning) !important;
+        color: var(--rz-on-warning) !important;
+        width: 2rem !important;
+        height: 2rem !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 20px;
+    }
+</style>
 
 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
     <RadzenLabel><h4>Config. Restaurante</h4></RadzenLabel>
@@ -11,47 +37,147 @@
     </RadzenBreadCrumb>
 </RadzenStack>
 
-@*<RadzenCard>
+<RadzenCard>
+    <RadzenTemplateForm TItem="Restaurante" Data="@restaurante" Submit=@OnSubmit>
         <RadzenFieldset>
-            <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" RowGap="0.25rem">
-                <RadzenStack Gap="1rem" Class="rz-p-4 rz-p-md-12" Style="padding: 0 !important">
-                    <RadzenColumn Size="12" SizeMD="6" Style="width: 100%; text-align: center;">
-                        <div style="width: 100%">
-                            <RadzenUpload Url="upload/single" Accept="image/*" Icon="photo_camera" ChooseText="" Complete=@CompleteUpload Style="border-radius: 20px; position: relative; left: 4rem; top: 3rem;"></RadzenUpload>
-                        </div>
-                        <RadzenImage Path="@path" class="rz-gravatar icone" Visible="@mostraFoto" />
-                    </RadzenColumn>
-                    <RadzenColumn Size="12" SizeMD="6" Style="width: 100%; text-align: center;">
-                        <div style="width: 100%">
-                            <RadzenUpload Url="upload/single" Accept="image/*" Icon="photo_camera" ChooseText="" Complete=@CompleteUpload Style="border-radius: 20px; position: relative; left: 4rem; top: 3rem;"></RadzenUpload>
-                        </div>
-                        <RadzenImage Path="@path" class="rz-gravatar icone" Visible="@mostraFoto" />
-                        <RadzenGravatar Email="@(usuario.Email)" class="icone" Visible="@mostraAvatar" />
-                    </RadzenColumn>
-                </RadzenStack>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem" Gap="1rem" Class="rz-p-4 rz-p-md-12" Style="padding: 0 !important">
+                <RadzenColumn Size="12" SizeMD="6" Style="width: 100%; text-align: center;">
+                    <div style="width: 100%">
+                        <RadzenUpload Url="upload/single" Accept="image/*" Icon="photo_camera" ChooseText="" Complete=@CompleteUpload Style="border-radius: 20px; position: relative; left: 4rem; top: 3rem;"></RadzenUpload>
+                    </div>
+                    <RadzenImage Path="@path" class="rz-gravatar icone" Visible="@mostraFoto" />
+                    <RadzenIcon class="rz-gravatar icone" Visible="@mostraIcone" Icon="restaurant" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6" Style="width: 100%; text-align: center;">
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="12">
+                            <RadzenFormField Text="Nome" Variant="Variant.Outlined" Style="width: 100%">
+                                <ChildContent>
+                                    <RadzenTextBox Name="Nome" @bind-Value=@restaurante.Nome Style="display: block; width: 100%" MaxLength="100" AutoComplete="false" />
+                                    <RadzenRequiredValidator Component="Nome" Text="Nome é Obrigatório" Popup="true" Style="position: absolute" />
+                                </ChildContent>
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Telefone" Variant="Variant.Outlined" Style="width: 100%">
+                                <ChildContent>
+                                    <RadzenTextBox Name="Telefone" @bind-Value=@restaurante.Telefone Style="display: block; width: 100%" MaxLength="100" AutoComplete="false" />
+                                    <RadzenRequiredValidator Component="Telefone" Text="Telefone é Obrigatório" Popup="true" Style="position: absolute" />
+                                </ChildContent>
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Endereço" Variant="Variant.Outlined" Style="width: 100%">
+                                <ChildContent>
+                                    <RadzenTextBox Name="Endereco" @bind-Value=@restaurante.Endereco Style="display: block; width: 100%" MaxLength="100" AutoComplete="false" />
+                                    <RadzenRequiredValidator Component="Endereco" Text="Endereço é Obrigatório" Popup="true" Style="position: absolute" />
+                                </ChildContent>
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="E-mail" Variant="Variant.Outlined" Style="width: 100%">
+                                <ChildContent>
+                                    <RadzenTextBox Name="Email" @bind-Value=@restaurante.Email Style="display: block; width: 100%" MaxLength="100" AutoComplete="false" />
+                                </ChildContent>
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Cor" Variant="Variant.Outlined" Style="width: 100%">
+                                <ChildContent>
+                                    <RadzenColorPicker Name="CorPrimaria" @bind-Value=@restaurante.CorPrimaria ShowHSV="true" ShowRGBA="false" ShowColors="true" ShowButton="true" />
+                                </ChildContent>
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="12">
+                            <RadzenFormField Text="Descrição" Variant="Variant.Outlined" Style="width: 100%">
+                                <ChildContent>
+                                    <RadzenTextArea Name="Descricao" @bind-Value=@restaurante.Descricao Style="display: block; width: 100%; height: 8rem" MaxLength="500" AutoComplete="false" />
+                                </ChildContent>
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" Class="rz-mt-4">
+                <RadzenColumn Size="12" SizeMD="12" Style="text-align:center">
+                    <RadzenButton ButtonType="ButtonType.Submit" Class="button-primary" Text="Salvar"></RadzenButton>
+                </RadzenColumn>
             </RadzenRow>
         </RadzenFieldset>
-</RadzenCard>*@
+    </RadzenTemplateForm>
+</RadzenCard>
 
 @code {
     [Parameter]
     public Restaurante restaurante { get; set; }
 
     public bool mostraFoto { get; set; } = false;
-    public bool mostraAvatar { get; set; } = true;
+    public bool mostraIcone { get; set; } = true;
 
-    public string? path { get; set; } = null;
-    public string? fileName { get; set; } = null;
-    public string? base64 { get; set; } = null;
+    public string path { get; set; } = null;
+    public string fileName { get; set; } = null;
+    public string base64 { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        //if (usuario.MidiaId.HasValue)
-        //{
-        //    mostraAvatar = false;
-        //    mostraFoto = true;
-        //    path = $"/Midia/GetMidia?Id={usuario.MidiaId}";
-        //}
+        if (restaurante.MidiaId.HasValue)
+        {
+            mostraIcone = false;
+            mostraFoto = true;
+            path = $"/Midia/GetMidia?Id={restaurante.MidiaId}";
+        }
+    }
+
+    public void CompleteUpload(UploadCompleteEventArgs args)
+    {
+        var result = Newtonsoft.Json.Linq.JObject.Parse(args.JsonResponse.RootElement.ToString());
+        fileName = result.GetValue("fileName")?.ToString();
+        base64 = result.GetValue("base64")?.ToString();
+        path = $"data:{result.GetValue("contentType")};base64,{result.GetValue("base64")}";
+        mostraIcone = false;
+        mostraFoto = true;
+    }
+
+    async void OnSubmit(Restaurante restaurante)
+    {
+        var popupConfirma = await DialogService.Confirm($"Deseja salvar suas informações de Perfil?", "Salvar", new ConfirmOptions() { OkButtonText = "Sim", CancelButtonText = "Não" });
+        if (popupConfirma == true)
+        {
+            using (var scope = scopeFactory.CreateScope())
+            {
+                if (!string.IsNullOrEmpty(base64))
+                {
+                    if (restaurante.MidiaId.HasValue)
+                    {
+                        var midia = scope.ServiceProvider.GetRequiredService<IMidiaRepository>().GetById(restaurante.MidiaId.Value);
+                        midia.Arquivo = Convert.FromBase64String(base64);
+                        midia.Nome = fileName;
+                        scope.ServiceProvider.GetRequiredService<IMidiaRepository>().InsertOrReplace(midia);
+                    }
+                    else
+                    {
+                        var midia = new Midia()
+                        {
+                            Arquivo = Convert.FromBase64String(base64),
+                            Nome = fileName,
+                        };
+                        scope.ServiceProvider.GetRequiredService<IMidiaRepository>().InsertOrReplace(midia);
+                        restaurante.MidiaId = midia.Id;
+                    }
+                }
+
+                var retorno = scope.ServiceProvider.GetRequiredService<IRestauranteRepository>().InsertOrReplace(restaurante);
+
+                await JS.InvokeVoidAsync("notifica", retorno.Sucesso ? "" : "Erro", retorno.Mensagem, retorno.Sucesso);
+                await JS.InvokeVoidAsync("recarregaTela");
+            }
+        }
     }
 }

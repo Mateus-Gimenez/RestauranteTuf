@@ -30,6 +30,15 @@
         .rz-dropdown-clear-icon {
             margin-right: 1rem;
         }
+
+        .rz-header .rz-profile-menu {
+            background-color: transparent !important;
+        }
+
+        .rz-layout > .rz-header, .rz-sidebar-toggle:hover {
+            background-color: @Html.Raw(string.IsNullOrEmpty(restaurante.CorPrimaria) ? "var(--rz-header-background-color)" : restaurante.CorPrimaria) !important;
+        }
+
     </style>
 </head>
 <body>

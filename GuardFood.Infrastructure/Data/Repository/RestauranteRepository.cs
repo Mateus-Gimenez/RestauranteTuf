@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GuardFood.Core.Context;
 using Microsoft.EntityFrameworkCore;
 using GuardFood.Core.Identity;
+using GuardFood.Core.Data.ViewModel;
 
 namespace GuardFood.Core.Data.Repository
 {
@@ -36,7 +37,7 @@ namespace GuardFood.Core.Data.Repository
             _dbContext.SaveChanges();
         }
 
-        public void InsertOrReplace(Restaurante restaurante)
+        public RetornoViewModel InsertOrReplace(Restaurante restaurante)
         {
             try
             {
@@ -57,10 +58,11 @@ namespace GuardFood.Core.Data.Repository
                 }
                 _dbContext.SaveChanges();
 
+                return new RetornoViewModel() { Sucesso = true, Mensagem = $"Configurações editadas com sucesso" };
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                return new RetornoViewModel() { Sucesso = false, Mensagem = e.Message };
             }
         }
     }

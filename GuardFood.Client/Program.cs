@@ -36,7 +36,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; }).AddHubOptions(options =>
 {
     options.EnableDetailedErrors = true;
-    options.MaximumReceiveMessageSize = 10485760;
+    options.MaximumReceiveMessageSize = int.MaxValue;
 });
 builder.Services.AddHttpClient();
 builder.Services.AddRadzenComponents();

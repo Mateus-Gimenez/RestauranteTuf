@@ -25,5 +25,25 @@ namespace GuardFood.Client.Controllers
             var midia = _midiaRepository.GetById(id);
             return File(midia.Arquivo, $"application/{midia.Extensao}");
         }
+
+        [HttpPost("upload/single")]
+        public IActionResult Single(IFormFile file)
+        {
+            try
+            {
+                using var ms = new MemoryStream();
+                file.CopyTo(ms);
+                return Ok(new
+                {
+                    file.FileName,
+                    file.ContentType,
+                    Base64 = Convert.ToBase64String(ms.ToArray())
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
