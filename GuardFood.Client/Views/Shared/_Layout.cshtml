@@ -27,6 +27,12 @@
     <script src="~/lib/iziToast/iziToast.js" asp-append-version="true"></script>
 
     <style>
+        @@media (max-width: 768px) {
+            .rz-dialog:not(.rz-dialog-confirm):not(.rz-dialog-alert) {
+                top: 150px !important;
+            }
+        }
+
         .rz-dropdown-clear-icon {
             margin-right: 1rem;
         }
@@ -36,7 +42,7 @@
         }
 
         .rz-layout > .rz-header, .rz-sidebar-toggle:hover {
-            background-color: @Html.Raw(string.IsNullOrEmpty(restaurante.CorPrimaria) ? "var(--rz-header-background-color)" : restaurante.CorPrimaria) !important;
+            background-color: @Html.Raw(string.IsNullOrEmpty(restaurante?.CorPrimaria) ? "var(--rz-header-background-color)" : restaurante?.CorPrimaria) !important;
         }
 
     </style>
