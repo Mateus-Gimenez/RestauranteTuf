@@ -15,11 +15,7 @@
     <ChildContent>
         <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.NoWrap" class="rz-p-12">
             <RadzenDropZone Value="Pedido.StatusPedido.Recebido" class="rz-display-flex rz-flex-column rz-background-color-warning-lighter rz-border-warning-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem; overflow-y: scroll; height: calc(100vh - 18rem); min-width: 15rem;">
-                <div>
-                    <div>
-                        <RadzenText Text="Recebido" TextStyle="TextStyle.Subtitle2" />
-                    </div>
-                </div>
+                <RadzenText Text="Recebido" TextStyle="TextStyle.Subtitle2" />
             </RadzenDropZone>
 
             <RadzenDropZone Value="Pedido.StatusPedido.EmAndamento" class="rz-display-flex rz-flex-column rz-background-color-info-lighter rz-border-info-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem; overflow-y: scroll; height: calc(100vh - 18rem); min-width: 15rem; ">
@@ -83,34 +79,34 @@
         using (var scope = scopeFactory.CreateScope())
         {
 
-            var mesas = scope.ServiceProvider.GetRequiredService<IMesaRepository>().BuscarTodosPorRestauranteId(restauranteId);
-            var produtos = scope.ServiceProvider.GetRequiredService<IProdutoRepository>().BuscarTodosPorRestauranteId(restauranteId);
-            foreach (var m in mesas)
-            {
-                var pedido = new Pedido()
-                {
-                    RestauranteId = restauranteId,
-                    NomeCliente = "Cliente Teste",
-                    MesaId = m.Id,
-                };
+            //var mesas = scope.ServiceProvider.GetRequiredService<IMesaRepository>().BuscarTodosPorRestauranteId(restauranteId);
+            //var produtos = scope.ServiceProvider.GetRequiredService<IProdutoRepository>().BuscarTodosPorRestauranteId(restauranteId);
+            //foreach (var m in mesas)
+            //{
+            //    var pedido = new Pedido()
+            //    {
+            //        RestauranteId = restauranteId,
+            //        NomeCliente = "Cliente Teste",
+            //        MesaId = m.Id,
+            //    };
 
-                scope.ServiceProvider.GetRequiredService<IPedidoRepository>().InserirEditar(pedido);
+            //    scope.ServiceProvider.GetRequiredService<IPedidoRepository>().InserirEditar(pedido);
 
-                foreach (var p in produtos)
-                {
-                    var pedidoProduto = new PedidoProduto()
-                    {
-                        NomeProduto = p.Nome,
-                        PedidoId = pedido.Id,
-                        ValorUnitario = p.Valor,
-                        Quantidade = new Random().Next(10),
-                        ProdutoId = p.Id,
-                        Observacao = "Sem sal",
-                        RestauranteId = pedido.RestauranteId,
-                    };
-                    scope.ServiceProvider.GetRequiredService<IPedidoProdutoRepository>().InserirEditar(pedidoProduto);
-                }
-            }
+            //    foreach (var p in produtos)
+            //    {
+            //        var pedidoProduto = new PedidoProduto()
+            //        {
+            //            NomeProduto = p.Nome,
+            //            PedidoId = pedido.Id,
+            //            ValorUnitario = p.Valor,
+            //            Quantidade = new Random().Next(10),
+            //            ProdutoId = p.Id,
+            //            Observacao = "Sem sal",
+            //            RestauranteId = pedido.RestauranteId,
+            //        };
+            //        scope.ServiceProvider.GetRequiredService<IPedidoProdutoRepository>().InserirEditar(pedidoProduto);
+            //    }
+            //}
         }
 
         GetPedidos();
