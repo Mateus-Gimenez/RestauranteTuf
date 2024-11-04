@@ -65,5 +65,25 @@ namespace GuardFood.Core.Data.Repository
                 return new RetornoViewModel() { Sucesso = false, Mensagem = e.Message };
             }
         }
+
+        public List<ProdutoCategoria> GetCardapio(Guid restauranteId)
+        {
+            var lista = _dbContext.Produtos.Include(i => i.ProdutoCategoria).Where(w => w.RestauranteId == restauranteId && w.Ativo && w.ProdutoCategoria.Ativo).ToList().GroupBy(g => g.ProdutoCategoria);
+            var retorno = new List<ProdutoCategoria>();
+
+            foreach (var l in lista.OrderBy(o => o.Key.Ordem))
+            {
+                var produtos = l.OrderBy(o => o.Ordem);
+                foreach(var p in l)
+                {
+                    p.ProdutoCategoria = null;
+                }
+                l.Key.Produtos = produtos.ToList();
+                retorno.Add(l.Key);
+            }
+
+            return retorno;
+        }
+
     }
 }

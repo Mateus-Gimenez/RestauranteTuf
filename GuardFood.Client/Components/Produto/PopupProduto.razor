@@ -2,9 +2,48 @@
 @inject DialogService DialogService;
 @inject IServiceScopeFactory ScopeFactory;
 
+<style>
+    .icone {
+        height: 12rem !important;
+        width: 12rem !important;
+    }
+
+    .rz-fileupload-buttonbar {
+        background-color: transparent;
+    }
+
+    .rz-fileupload-content {
+        display: none !important;
+    }
+
+    .rz-fileupload-choose {
+        background-color: var(--rz-warning) !important;
+        color: var(--rz-on-warning) !important;
+        width: 2rem !important;
+        height: 2rem !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 20px;
+    }
+</style>
+
 <RadzenTemplateForm TItem="Produto" Data=@produto Submit=@OnSubmit>
     <RadzenFieldset Text="Dados Produto">
         <RadzenStack Gap="1rem" Class="rz-p-4 rz-p-md-12" Style="padding: 0 !important">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="12" Style="width: 100%; text-align: center;">
+                    <div style="width: 100%">
+                        <RadzenUpload Url="upload/single" Accept="image/*" Icon="photo_camera" ChooseText="" Complete=@CompleteUpload Style="border-radius: 20px; position: relative; left: 4rem; top: 3rem;"></RadzenUpload>
+                    </div>
+                    <RadzenImage Path="@path" class="rz-gravatar icone" Visible="@mostraFoto" />
+                    <div class="rz-gravatar icone" style="@($"{(!mostraIcone ? "display: none;" : "")} background-color: #ccc")">
+                        <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;">
+                            <RadzenIcon Visible="@mostraIcone" Icon="restaurant" Style="font-size: 5rem;" />
+                        </div>
+                    </div>
+                </RadzenColumn>
+            </RadzenRow>
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="12">
                     <RadzenLabel Text="Nome" />
@@ -22,7 +61,7 @@
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="12">
                     <RadzenLabel Text="Descrição" />
-                    <RadzenTextArea Name="Descricao" @bind-Value=@produto.Descricao Style="display: block; width: 100%; height: 8rem" MaxLength="100" AutoComplete="false" />
+                    <RadzenTextArea Name="Descricao" @bind-Value=@produto.Descricao Style="display: block; width: 100%; height: 8rem" MaxLength="10000" AutoComplete="false" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenRow AlignItems="AlignItems.Center" Class="rz-mt-4">
@@ -52,15 +91,59 @@
     [Parameter]
     public int? ordem { get; set; }
 
+    public bool mostraFoto { get; set; } = false;
+    public bool mostraIcone { get; set; } = true;
+
+    public string path { get; set; } = null;
+    public string fileName { get; set; } = null;
+    public string base64 { get; set; } = null;
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        if (produto.MidiaId.HasValue)
+        {
+            mostraIcone = false;
+            mostraFoto = true;
+            path = $"/Midia/GetMidia?Id={produto.MidiaId}";
+        }
+    }
+
+    public void CompleteUpload(UploadCompleteEventArgs args)
+    {
+        var result = Newtonsoft.Json.Linq.JObject.Parse(args.JsonResponse.RootElement.ToString());
+        fileName = result.GetValue("fileName")?.ToString();
+        base64 = result.GetValue("base64")?.ToString();
+        path = $"data:{result.GetValue("contentType")};base64,{result.GetValue("base64")}";
+        mostraIcone = false;
+        mostraFoto = true;
     }
 
     async void OnSubmit(Produto produto)
     {
         using (var scope = ScopeFactory.CreateScope())
         {
+            if (!string.IsNullOrEmpty(base64))
+            {
+                if (produto.MidiaId.HasValue)
+                {
+                    var midia = scope.ServiceProvider.GetRequiredService<IMidiaRepository>().GetById(produto.MidiaId.Value);
+                    midia.Arquivo = Convert.FromBase64String(base64);
+                    midia.Nome = fileName;
+                    scope.ServiceProvider.GetRequiredService<IMidiaRepository>().InsertOrReplace(midia);
+                }
+                else
+                {
+                    var midia = new Midia()
+                    {
+                        Arquivo = Convert.FromBase64String(base64),
+                        Nome = fileName,
+                    };
+                    scope.ServiceProvider.GetRequiredService<IMidiaRepository>().InsertOrReplace(midia);
+                    produto.MidiaId = midia.Id;
+                }
+            }
+
             produto.ProdutoCategoriaId = categoria.Id;
             produto.RestauranteId = categoria.RestauranteId;
             produto.Ordem = ordem ?? produto.Ordem;

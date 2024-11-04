@@ -5,6 +5,14 @@
 @inject IDbContextFactory<GFContext> DbFactory;
 @inject IServiceScopeFactory scopeFactory;
 
+<style>
+
+    .rz-custom-header {
+        width: 100%;
+    }
+
+</style>
+
 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
     <RadzenLabel><h4>Produtos</h4></RadzenLabel>
     <RadzenBreadCrumb>
@@ -16,7 +24,14 @@
 <RadzenDataGrid @ref="gridCategoria" AllowFiltering="false" AllowColumnResize="true" AllowAlternatingRows="true" FilterMode="FilterMode.Simple" AllowSorting="false" EmptyText="Nenhum Registro Encontrado!" RowExpand="RowExpand"
                 IsLoading=@isLoading LoadData="@LoadDataCategoria" Data="@categorias" TItem="ProdutoCategoria" Responsive="true" LogicalFilterOperator="LogicalFilterOperator.And" Style="margin-top: 1.5rem; max-height: calc(100vh - 13rem)">
     <HeaderTemplate>
-        <RadzenButton Text="Adicionar Categoria" Click=@(() => ExibePopupProdutoCategoria()) />
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+            <div>
+                <RadzenButton Text="+ Categoria" Click=@(() => ExibePopupProdutoCategoria()) />
+            </div>
+            <div>
+                <RadzenButton Text="Cardápio" Click=@(() => AbreCardapio()) ButtonStyle="ButtonStyle.Secondary" />
+            </div>
+        </RadzenStack>
     </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn TItem="ProdutoCategoria" Property="Ordem" Title="Ordem" />
@@ -36,10 +51,24 @@
         <RadzenDataGrid AllowFiltering="false" AllowColumnResize="true" AllowAlternatingRows="true" FilterMode="FilterMode.Simple" AllowSorting="false" EmptyText="Nenhum Registro Encontrado!"
                         IsLoading=@isLoading Data="@categoria.Produtos" TItem="Produto" Responsive="true" LogicalFilterOperator="LogicalFilterOperator.And" Style="margin-top: 1.5rem; max-height: calc(100vh - 13rem)">
             <HeaderTemplate>
-                <RadzenButton Text="Adicionar Produto" Click=@(() => ExibePopupProduto(categoria)) />
+                <RadzenButton Text="+ Produto" Click=@(() => ExibePopupProduto(categoria)) />
             </HeaderTemplate>
             <Columns>
                 <RadzenDataGridColumn TItem="Produto" Property="Ordem" Title="Ordem" />
+                <RadzenDataGridColumn TItem="Produto" Property="MidiaId" Title="Imagem" Context="data">
+                    <Template>
+                        @if (data.MidiaId.HasValue)
+                        {
+                            <RadzenImage Path="@($"/Midia/GetMidia?id={data.MidiaId}")" Style="height: 5rem; width: 5rem; border-radius: 0.5rem;" />
+                        }
+                        else
+                        {
+                            <div style="height: 5rem; width: 5rem; background-color: #ccc; border-radius: 0.5rem; display: flex; justify-content: center; align-items: center;">
+                                <RadzenIcon Icon="restaurant" Style="@($"color: var(--rz-primary); font-size: 2.5rem;")" />
+                            </div>
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="Produto" Property="Nome" Title="Nome" Filterable="true" Sortable="true" />
                 <RadzenDataGridColumn TItem="Produto" Property="Descricao" Title="Descrição" />
                 <RadzenDataGridColumn TItem="Produto" Property="ValorMonetario" Title="Valor" />
@@ -251,6 +280,11 @@
 
             await ResetCategoria();
         }
+    }
+
+    async void AbreCardapio()
+    {
+        await JsRuntime.InvokeVoidAsync("abreTela", "/Cardapio?id=" + restauranteId);
     }
 
 }

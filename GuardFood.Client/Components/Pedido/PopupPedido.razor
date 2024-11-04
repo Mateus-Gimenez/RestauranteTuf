@@ -3,7 +3,7 @@
 @inject DialogService DialogService;
 @inject IServiceScopeFactory scopeFactory;
 
-<RadzenDataGrid Data="@produtos">
+<RadzenDataGrid Data="@produtos" Responsive="true" Style="max-height: calc(100vh - 25rem)">
     <Columns>
         <RadzenDataGridColumn TItem="PedidoProduto" Property="NomeProduto" Title="Produto" Filterable="false" Sortable="false" FilterOperator="FilterOperator.StartsWith">
             <FooterTemplate>

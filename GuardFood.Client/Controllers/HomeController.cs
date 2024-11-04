@@ -46,6 +46,15 @@ namespace GuardFood.Client.Controllers
             return View("~/Views/Restaurante/Configuracoes.cshtml", restaurante);
         }
 
+        [AllowAnonymous]
+        [Route("/Cardapio")]
+        public IActionResult Cardapio(Guid id)
+        {
+            var restaurante = _restauranteRepository.GetById(id);
+            ViewData["Categorias"] = _restauranteRepository.GetCardapio(restaurante.Id);
+            return View("~/Views/Pedido/Cardapio.cshtml", restaurante);
+        }
+
         public IActionResult Privacy()
         {
             return View();

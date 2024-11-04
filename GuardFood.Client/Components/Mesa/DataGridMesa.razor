@@ -11,9 +11,9 @@
     </RadzenBreadCrumb>
 </RadzenStack>
 
-<RadzenDataGrid Data="@mesas" @ref="gridMesa" LoadData="@LoadDataMesa">
+<RadzenDataGrid Data="@mesas" @ref="gridMesa" LoadData="@LoadDataMesa" Responsive="true">
     <HeaderTemplate>
-        <RadzenButton Text="Adicionar Mesa" Click=@(() => ExibePopupMesa()) />
+        <RadzenButton Text="+ Mesa" Click=@(() => ExibePopupMesa()) />
     </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn TItem="Mesa" Property="Codigo" Title="Código" Filterable="false" Sortable="false" FilterOperator="FilterOperator.StartsWith">

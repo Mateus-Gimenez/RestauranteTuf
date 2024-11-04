@@ -6,6 +6,10 @@ function redirecionaTela(url) {
     window.location.href = url;
 }
 
+function abreTela(url) {
+    window.open(url, "_blank");
+}
+
 function recarregaTela() {
     window.location.reload();
 }

@@ -14,5 +14,6 @@ namespace GuardFood.Core.Data.Interfaces
         Restaurante GetById(Guid restauranteId);
         RetornoViewModel InsertOrReplace(Restaurante restaurante);
         void Delete(Guid Id);
+        List<ProdutoCategoria> GetCardapio(Guid restauranteId);
     }
 }

@@ -12,7 +12,7 @@
 </RadzenStack>
 
 <RadzenLabel Style="margin-top: 2.5rem"><h6>Master</h6></RadzenLabel>
-<RadzenDataGrid Data="@master" TItem="Usuario">
+<RadzenDataGrid Data="@master" TItem="Usuario" Responsive="true">
     <Columns>
         <RadzenDataGridColumn TItem="Usuario" Property="Nome" Title="Nome" FilterOperator="FilterOperator.StartsWith" />
         <RadzenDataGridColumn TItem="Usuario" Property="Email" Title="E-mail" FilterOperator="FilterOperator.StartsWith" />
@@ -22,7 +22,7 @@
 </RadzenDataGrid>
 
 <RadzenLabel Style="margin-top: 2.5rem"><h6>Funcionários</h6></RadzenLabel>
-<RadzenDataGrid Data="@funcionarios" @ref="gridFuncionarios" LoadData="@LoadDataMesa">
+<RadzenDataGrid Data="@funcionarios" @ref="gridFuncionarios" LoadData="@LoadDataMesa" Responsive="true">
     <HeaderTemplate>
         <RadzenButton Text="Adicionar Funcionário" Click=@(() => ExibePopupUsuario()) />
     </HeaderTemplate>
