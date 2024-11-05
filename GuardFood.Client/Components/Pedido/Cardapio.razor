@@ -7,6 +7,12 @@
         z-index: 999 !important;
     }
 
+    .rz-dropdown-items .rz-state-highlight {
+        font-weight: 700 !important;
+        color: black !important;
+        background-color: #0000001f !important;
+    }
+
     #group-list .rz-datalist-data {
         padding: 0 !important;
     }
@@ -61,7 +67,7 @@
 
 <RadzenLayout>
     <RadzenHeader>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0" Style="height: 100%;">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Style="padding-left:1rem; height: 100%">
                 @if (restaurante?.MidiaId == null)
                 {
@@ -73,11 +79,12 @@
                 }
                 <RadzenLabel Text="@restaurante?.Nome" />
             </RadzenStack>
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Style="padding-right:1rem">
-            </RadzenStack>
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenDropDown @bind-Value="categoriaAtual" Change="RedirecionaCategoria" Data=@categorias TextProperty="@nameof(ProdutoCategoria.Nome)" Style="width: 100%;" />
         </RadzenStack>
     </RadzenHeader>
-    <RadzenBody>
+    <RadzenBody @onscroll="Teste">
         <div id="corpo-principal" class="rz-p-4">
             <div class="container">
                 @*<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
@@ -98,28 +105,30 @@
                 <div id="group-list">
                     @foreach (var c in categorias)
                     {
-                        <RadzenText id="@c.Id" TextStyle="TextStyle.DisplayH6" Style="padding: 1rem">@c.Nome</RadzenText>
-                        <RadzenDataList Data="c.Produtos" Density="Density.Compact">
-                            <Template Context="produto">
-                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-                                    <div class="produto-info">
-                                        <div class="produto-nome">@produto.Nome</div>
-                                        <div class="produto-descricao">@produto.Descricao </div>
-                                        <div class="produto-valor">@produto.ValorMonetario</div>
-                                    </div>
-                                    @if (produto.MidiaId.HasValue)
-                                    {
-                                        <RadzenImage Path="@($"/Midia/GetMidia?id={produto.MidiaId}")" Style="height: 5rem; width: 5rem; border-radius: 0.5rem; object-fit: cover;" />
-                                    }
-                                    else
-                                    {
-                                        <div class="icone-imagem">
-                                            <RadzenIcon Icon="restaurant" Style="@($"color: {restaurante.CorPrimaria}; font-size: 2.5rem;")" />
+                        @*<div class="categoria" data-ordem="@(categorias.IndexOf(c))">*@
+                            <RadzenText id="@c.Id" TextStyle="TextStyle.DisplayH6" Style="padding: 1rem" data-ordem="@(categorias.IndexOf(c))" class="categoria">@c.Nome</RadzenText>
+                            <RadzenDataList Data="c.Produtos" Density="Density.Compact">
+                                <Template Context="produto">
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                                        <div class="produto-info">
+                                            <div class="produto-nome">@produto.Nome</div>
+                                            <div class="produto-descricao">@produto.Descricao </div>
+                                            <div class="produto-valor">@produto.ValorMonetario</div>
                                         </div>
-                                    }
-                                </RadzenStack>
-                            </Template>
-                        </RadzenDataList>
+                                        @if (produto.MidiaId.HasValue)
+                                        {
+                                            <RadzenImage Path="@($"/Midia/GetMidia?id={produto.MidiaId}")" Style="height: 5rem; width: 5rem; border-radius: 0.5rem; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="icone-imagem">
+                                                <RadzenIcon Icon="restaurant" Style="@($"color: {restaurante.CorPrimaria}; font-size: 2.5rem;")" />
+                                            </div>
+                                        }
+                                    </RadzenStack>
+                                </Template>
+                            </RadzenDataList>
+                        @*</div>*@
                     }
                 </div>
             </div>
@@ -129,16 +138,36 @@
 
 @code {
 
-    [Parameter]
-    public Restaurante restaurante { get; set; }
+        [Parameter]
+        public Restaurante restaurante { get; set; }
 
-    [Parameter]
-    public List<ProdutoCategoria> categorias { get; set; } = new List<ProdutoCategoria>();
+        [Parameter]
+        public List<ProdutoCategoria> categorias { get; set; } = new List<ProdutoCategoria>();
 
+    public ProdutoCategoria categoriaAtual { get; set; }
+
+    protected override void OnInitialized()
+    {
+        categoriaAtual = categorias.First();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public async void Teste()
+    {
+        var ordem = await Js.InvokeAsync<int>("GetCategoriaAtual");
+        if(categoriaAtual != categorias[ordem])
+        {
+            categoriaAtual = categorias[ordem];
+        }
+    }
+
+    public async void RedirecionaCategoria()
+    {
+        await Js.InvokeVoidAsync("RedirecionaCategoria", categoriaAtual.Id);
     }
 
 }

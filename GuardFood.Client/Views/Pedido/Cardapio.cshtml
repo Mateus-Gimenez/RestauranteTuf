@@ -51,5 +51,28 @@
     <script src="_framework/blazor.server.js"></script>
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)" asp-append-version="true"></script>
 
+    <script>
+
+        function GetCategoriaAtual() {
+            const categorias = document.querySelectorAll(".categoria");
+            let categoriaAtual = 0;
+
+            categorias.forEach((categoria) => {
+                const rect = categoria.getBoundingClientRect();
+                if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
+                    categoriaAtual = parseInt(categoria.dataset.ordem);
+                }
+            });
+
+            // Chama o método Blazor para atualizar a categoria atual
+            return categoriaAtual;
+        }
+
+        function RedirecionaCategoria(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+    </script>
+
 </body>
 </html>
