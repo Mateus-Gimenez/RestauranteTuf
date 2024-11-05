@@ -28,6 +28,9 @@
     .produto-nome {
         font-weight: 800;
         font-size: 1rem;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
     }
 
     .produto-descricao {
@@ -106,7 +109,7 @@
                                     </div>
                                     @if (produto.MidiaId.HasValue)
                                     {
-                                        <RadzenImage Path="@($"/Midia/GetMidia?id={produto.MidiaId}")" Style="height: 5rem; width: 5rem; border-radius: 0.5rem;" />
+                                        <RadzenImage Path="@($"/Midia/GetMidia?id={produto.MidiaId}")" Style="height: 5rem; width: 5rem; border-radius: 0.5rem; object-fit: cover;" />
                                     }
                                     else
                                     {

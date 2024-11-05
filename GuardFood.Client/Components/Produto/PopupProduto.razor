@@ -34,7 +34,7 @@
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="12" Style="width: 100%; text-align: center;">
                     <div style="width: 100%">
-                        <RadzenUpload Url="upload/single" Accept="image/*" Icon="photo_camera" ChooseText="" Complete=@CompleteUpload Style="border-radius: 20px; position: relative; left: 4rem; top: 3rem;"></RadzenUpload>
+                        <RadzenUpload Url="upload/single" Accept="image/*" Icon="photo_camera" ChooseText="" Complete=@CompleteUpload Style="border-radius: 20px; position: relative; left: 4rem; top: 3rem; object-fit: cover;"></RadzenUpload>
                     </div>
                     <RadzenImage Path="@path" class="rz-gravatar icone" Visible="@mostraFoto" />
                     <div class="rz-gravatar icone" style="@($"{(!mostraIcone ? "display: none;" : "")} background-color: #ccc")">

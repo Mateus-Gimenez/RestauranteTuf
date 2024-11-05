@@ -59,7 +59,7 @@
                     <Template>
                         @if (data.MidiaId.HasValue)
                         {
-                            <RadzenImage Path="@($"/Midia/GetMidia?id={data.MidiaId}")" Style="height: 5rem; width: 5rem; border-radius: 0.5rem;" />
+                            <RadzenImage Path="@($"/Midia/GetMidia?id={data.MidiaId}")" Style="height: 5rem; width: 5rem; border-radius: 0.5rem; object-fit: cover;" />
                         }
                         else
                         {
