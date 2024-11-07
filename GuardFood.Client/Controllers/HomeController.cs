@@ -52,7 +52,7 @@ namespace GuardFood.Client.Controllers
         {
             var restaurante = _restauranteRepository.GetById(id);
             ViewData["Categorias"] = _restauranteRepository.GetCardapio(restaurante.Id);
-            return View("~/Views/Pedido/Cardapio.cshtml", restaurante);
+            return View("~/Views/Cardapio/Cardapio.cshtml", restaurante);
         }
 
         public IActionResult Privacy()

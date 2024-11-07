@@ -24,11 +24,6 @@
     <script src="~/lib/iziToast/iziToast.js" asp-append-version="true"></script>
 
     <style>
-        @@media (max-width: 768px) {
-            .rz-dialog:not(.rz-dialog-confirm):not(.rz-dialog-alert) {
-                top: 150px !important;
-            }
-        }
 
         .rz-dropdown-clear-icon {
             margin-right: 1rem;
@@ -46,7 +41,7 @@
 </head>
 <body>
 
-    <component type="typeof(GuardFood.Client.Components.Pedido.Cardapio)" render-mode="Server" param-restaurante="Model" param-categorias="ViewBag.Categorias" />
+    <component type="typeof(GuardFood.Client.Components.Cardapio.Cardapio)" render-mode="Server" param-restaurante="Model" param-categorias="ViewBag.Categorias" />
 
     <script src="_framework/blazor.server.js"></script>
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)" asp-append-version="true"></script>

@@ -60,7 +60,6 @@
             max-width: 50%;
         }
     }
-
 </style>
 
 <RadzenComponents />
@@ -93,7 +92,7 @@
                         <RadzenText id="@c.Id" TextStyle="TextStyle.DisplayH6" Style="padding: 1rem" data-ordem="@(categorias.IndexOf(c))" class="categoria">@c.Nome</RadzenText>
                         <RadzenDataList Data="c.Produtos" Density="Density.Compact">
                             <Template Context="produto">
-                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" @onclick="() => AbrePopupPedidoProduto(produto)" Style="cursor: pointer">
                                     <div class="produto-info">
                                         <div class="produto-nome">@produto.Nome</div>
                                         <div class="produto-descricao">@produto.Descricao </div>
@@ -117,8 +116,6 @@
             </div>
         </div>
     </RadzenBody>
-    <RadzenFooter>
-    </RadzenFooter>
 </RadzenLayout>
 
 @code {
@@ -144,7 +141,7 @@
     public async void AlteraCategoria()
     {
         var ordem = await Js.InvokeAsync<int>("GetCategoriaAtual");
-        if(categoriaAtual != categorias[ordem])
+        if (categoriaAtual != categorias[ordem])
         {
             categoriaAtual = categorias[ordem];
         }
@@ -153,6 +150,11 @@
     public async void RedirecionaCategoria()
     {
         await Js.InvokeVoidAsync("RedirecionaCategoria", categoriaAtual.Id);
+    }
+
+    public async void AbrePopupPedidoProduto(Produto produto)
+    {
+        await DialogService.OpenAsync<PopupProdutoPedido>("Detalhe do Produto", new Dictionary<string, object>() { { "restaurante", restaurante }, { "produto", produto } }, new DialogOptions() { Width = "100vw", Height = "100vh", Resizable = false, Draggable = false });
     }
 
 }

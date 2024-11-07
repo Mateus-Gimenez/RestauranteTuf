@@ -1,0 +1,121 @@
+﻿@using System.Linq.Dynamic.Core;
+@inject IJSRuntime JsRuntime;
+@inject DialogService DialogService;
+@inject IServiceScopeFactory scopeFactory;
+
+<style>
+
+    .imagem-produto {
+        background-image: url('@($"Midia/GetMidia?Id={produto.MidiaId}")');
+        background-repeat: no-repeat;
+        height: 100%;
+        width: 100%;
+        background-color: #ccc;
+        background-position: center;
+        background-size: contain;
+    }
+
+    .icone-produto {
+        height: 100%;
+        width: 100%;
+        background-color: #ccc;
+        border-radius: 0.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .produto-descricao-popup {
+        color: rgb(127, 143, 159);
+        font-size: 0.8rem;
+    }
+
+    .label-observacao {
+        font-weight: 800;
+        font-size: 1.125rem;
+        line-height: 1.688rem;
+        letter-spacing: 0.01em;
+        color: rgb(48, 51, 60);
+    }
+
+    .label-quantidade {
+        font-weight: 500;
+        font-size: 1.125rem;
+        line-height: 1.688rem;
+        letter-spacing: 0.01em;
+        color: rgb(48, 51, 60);
+    }
+
+</style>
+
+<div class="container">
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Center">
+        <RadzenRow Style="height: 25vh">
+            @if (produto.MidiaId.HasValue)
+            {
+                <div class="imagem-produto"></div>
+            }
+            else
+            {
+                <div class="icone-produto">
+                    <RadzenIcon Icon="restaurant" Style="@($"color: {restaurante.CorPrimaria}; font-size: 2.5rem;")" />
+                </div>
+            }
+        </RadzenRow>
+        <RadzenRow Style="height: 25vh; overflow: auto">
+            <div>
+                <div class="produto-nome">@produto.Nome</div>
+                <div class="produto-descricao-popup">@produto.Descricao </div>
+            </div>
+        </RadzenRow>
+        <RadzenRow>
+            <div class="produto-valor">@produto.ValorMonetario</div>
+        </RadzenRow>
+        <RadzenRow Style="height: 15vh">
+            <RadzenLabel Text="Observações" class="label-observacao" />
+            <RadzenTextArea Placeholder="Digite as observações aqui..." Style="width: 100%" />
+        </RadzenRow>
+        <RadzenRow JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                <RadzenButton Text="-" Disabled="pedidoProduto.Quantidade == 1" Click="DiminuiQuantidade" />
+                <span class="label-observacao">@(pedidoProduto.Quantidade)</span>
+                <RadzenButton Text="+" Click="AumentaQuantidade" />
+            </RadzenStack>
+            <RadzenButton Text="Adicionar" Click="FechaPopup" />
+        </RadzenRow>
+    </RadzenStack>
+</div>
+
+@code {
+
+    [Parameter]
+    public Restaurante restaurante { get; set; }
+
+    [Parameter]
+    public Produto produto { get; set; }
+
+    public PedidoProduto pedidoProduto { get; set; } = new PedidoProduto() { Quantidade = 1 };
+
+    public int quantidade { get; set; } = 1;
+
+    public string GetValor()
+    {
+        return (produto.Valor * quantidade).ToString("C");
+    }
+
+    public void DiminuiQuantidade()
+    {
+        pedidoProduto.Quantidade--;
+    }
+
+    public void AumentaQuantidade()
+    {
+        pedidoProduto.Quantidade++;
+    }
+
+    public void FechaPopup()
+    {
+        DialogService.Close();
+    }
+
+}
