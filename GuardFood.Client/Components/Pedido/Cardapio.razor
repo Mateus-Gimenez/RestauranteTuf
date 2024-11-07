@@ -84,65 +84,50 @@
             <RadzenDropDown @bind-Value="categoriaAtual" Change="RedirecionaCategoria" Data=@categorias TextProperty="@nameof(ProdutoCategoria.Nome)" Style="width: 100%;" />
         </RadzenStack>
     </RadzenHeader>
-    <RadzenBody @onscroll="Teste">
+    <RadzenBody @onscroll="AlteraCategoria">
         <div id="corpo-principal" class="rz-p-4">
             <div class="container">
-                @*<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-                    <div class="container">
-                        <div class="collapse navbar-collapse" id="navbarNav">
-                            <ul class="navbar-nav">
-                                @foreach (var c in categorias)
-                                {
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#@(c.Id)">@(c.Nome)</a>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-                    </div>
-                </nav>*@
-
                 <div id="group-list">
                     @foreach (var c in categorias)
                     {
-                        @*<div class="categoria" data-ordem="@(categorias.IndexOf(c))">*@
-                            <RadzenText id="@c.Id" TextStyle="TextStyle.DisplayH6" Style="padding: 1rem" data-ordem="@(categorias.IndexOf(c))" class="categoria">@c.Nome</RadzenText>
-                            <RadzenDataList Data="c.Produtos" Density="Density.Compact">
-                                <Template Context="produto">
-                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-                                        <div class="produto-info">
-                                            <div class="produto-nome">@produto.Nome</div>
-                                            <div class="produto-descricao">@produto.Descricao </div>
-                                            <div class="produto-valor">@produto.ValorMonetario</div>
+                        <RadzenText id="@c.Id" TextStyle="TextStyle.DisplayH6" Style="padding: 1rem" data-ordem="@(categorias.IndexOf(c))" class="categoria">@c.Nome</RadzenText>
+                        <RadzenDataList Data="c.Produtos" Density="Density.Compact">
+                            <Template Context="produto">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                                    <div class="produto-info">
+                                        <div class="produto-nome">@produto.Nome</div>
+                                        <div class="produto-descricao">@produto.Descricao </div>
+                                        <div class="produto-valor">@produto.ValorMonetario</div>
+                                    </div>
+                                    @if (produto.MidiaId.HasValue)
+                                    {
+                                        <RadzenImage Path="@($"/Midia/GetMidia?id={produto.MidiaId}")" Style="height: 5rem; width: 5rem; border-radius: 0.5rem; object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                        <div class="icone-imagem">
+                                            <RadzenIcon Icon="restaurant" Style="@($"color: {restaurante.CorPrimaria}; font-size: 2.5rem;")" />
                                         </div>
-                                        @if (produto.MidiaId.HasValue)
-                                        {
-                                            <RadzenImage Path="@($"/Midia/GetMidia?id={produto.MidiaId}")" Style="height: 5rem; width: 5rem; border-radius: 0.5rem; object-fit: cover;" />
-                                        }
-                                        else
-                                        {
-                                            <div class="icone-imagem">
-                                                <RadzenIcon Icon="restaurant" Style="@($"color: {restaurante.CorPrimaria}; font-size: 2.5rem;")" />
-                                            </div>
-                                        }
-                                    </RadzenStack>
-                                </Template>
-                            </RadzenDataList>
-                        @*</div>*@
+                                    }
+                                </RadzenStack>
+                            </Template>
+                        </RadzenDataList>
                     }
                 </div>
             </div>
         </div>
     </RadzenBody>
+    <RadzenFooter>
+    </RadzenFooter>
 </RadzenLayout>
 
 @code {
 
-        [Parameter]
-        public Restaurante restaurante { get; set; }
+    [Parameter]
+    public Restaurante restaurante { get; set; }
 
-        [Parameter]
-        public List<ProdutoCategoria> categorias { get; set; } = new List<ProdutoCategoria>();
+    [Parameter]
+    public List<ProdutoCategoria> categorias { get; set; } = new List<ProdutoCategoria>();
 
     public ProdutoCategoria categoriaAtual { get; set; }
 
@@ -156,7 +141,7 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    public async void Teste()
+    public async void AlteraCategoria()
     {
         var ordem = await Js.InvokeAsync<int>("GetCategoriaAtual");
         if(categoriaAtual != categorias[ordem])
