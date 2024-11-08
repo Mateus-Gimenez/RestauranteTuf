@@ -19,6 +19,7 @@ namespace GuardFood.Client.Controllers
         public IActionResult Index()
         {
             ViewData["RestauranteId"] = _userManager.GetUserAsync(User).Result.RestauranteId;
+            ViewData["UrlRequest"] = Request.Scheme + "://" + Request.Host.Value;
             return View();
         }
     }

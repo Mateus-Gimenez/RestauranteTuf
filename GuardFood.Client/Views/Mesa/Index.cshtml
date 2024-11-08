@@ -3,3 +3,27 @@
 }
 
 <component type="typeof(GuardFood.Client.Components.Mesa.DataGridMesa)" render-mode="Server" param-restauranteId="ViewBag.RestauranteId">
+
+<script>
+
+    function qrCode(id) {
+        window.open("@(Url.Action("CardapioPDF", "Cardapio"))?Mesa=" + id);
+    }
+
+    function copiarLink(id) {
+        var textArea = document.createElement("textarea");
+        const link = "@(ViewBag.UrlRequest)" + "@(Url.Action("CardapioPedido", "Cardapio"))?Mesa=" + id;
+        textArea.value = link;
+
+        document.body.appendChild(textArea);
+        textArea.select();
+        var resultado = document.execCommand("copy");
+
+        if (resultado) {
+            notifica("", "Link do Cardápio da Mesa copiado para sua Área de Transferência", true);
+        }
+
+        document.body.removeChild(textArea);
+    }
+
+</script>

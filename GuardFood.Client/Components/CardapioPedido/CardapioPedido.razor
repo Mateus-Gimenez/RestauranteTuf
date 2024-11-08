@@ -1,0 +1,204 @@
+﻿@inject IJSRuntime Js;
+@inject DialogService DialogService;
+
+<style>
+
+    .rz-sidebar {
+        z-index: 999 !important;
+    }
+
+    .rz-footer {
+        border-top: var(--rz-border-base-300);
+    }
+
+    .rz-button {
+        background-color: @((!string.IsNullOrEmpty(restaurante.CorPrimaria) ? restaurante.CorPrimaria : "var(--rz-primary)")) !important;
+    }
+
+    .rz-dropdown-items .rz-state-highlight {
+        font-weight: 700 !important;
+        color: black !important;
+        background-color: #0000001f !important;
+    }
+
+    #group-list .rz-datalist-data {
+        padding: 0 !important;
+    }
+
+    .icone-imagem {
+        height: 5rem;
+        width: 5rem;
+        background-color: #ccc;
+        border-radius: 0.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .produto-info {
+        max-width: 80%;
+    }
+
+    .produto-nome {
+        font-weight: 800;
+        font-size: 1rem;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+    }
+
+    .produto-descricao {
+        color: rgb(127, 143, 159);
+        font-size: 0.8rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+    }
+
+    .produto-valor {
+        font-weight: 600;
+        font-size: 1rem;
+        line-height: 0.87rem;
+        margin-top: 1rem;
+    }
+
+    .valor-total {
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    @@media (max-width: 768px) {
+        .produto-info {
+            max-width: 50%;
+        }
+    }
+</style>
+
+<RadzenComponents />
+
+<RadzenLayout>
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Style="padding-left:1rem; height: 100%">
+                @if (restaurante?.MidiaId == null)
+                {
+                    <RadzenIcon Icon="restaurant" Style="color: var(--rz-header-color); padding-right: 1rem" />
+                }
+                else
+                {
+                    <RadzenImage Path="@("/Midia/GetMidia?id=" + restaurante.MidiaId)" class="rz-gravatar" Style="margin-right:0.5rem;" />
+                }
+                <RadzenLabel Text="@restaurante?.Nome" />
+            </RadzenStack>
+            <span style="margin-right: 1rem">Mesa @(mesa.Codigo)</span>
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenDropDown @bind-Value="categoriaAtual" Change="RedirecionaCategoria" Data=@categorias TextProperty="@nameof(ProdutoCategoria.Nome)" Style="width: 100%;" />
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenBody @onscroll="AlteraCategoria">
+        <div id="corpo-principal" class="rz-p-4">
+            <div class="container">
+                <div id="group-list">
+                    @foreach (var c in categorias)
+                    {
+                        <RadzenText id="@c.Id" TextStyle="TextStyle.DisplayH6" Style="padding: 1rem" data-ordem="@(categorias.IndexOf(c))" class="categoria">@c.Nome</RadzenText>
+                        <RadzenDataList Data="c.Produtos" Density="Density.Compact">
+                            <Template Context="produto">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" @onclick="() => AbrePopupPedidoProduto(produto)" Style="cursor: pointer">
+                                    <div class="produto-info">
+                                        <div class="produto-nome">@produto.Nome</div>
+                                        <div class="produto-descricao">@produto.Descricao </div>
+                                        <div class="produto-valor">@produto.ValorMonetario</div>
+                                    </div>
+                                    @if (produto.MidiaId.HasValue)
+                                    {
+                                        <RadzenImage Path="@($"/Midia/GetMidia?id={produto.MidiaId}")" Style="height: 5rem; width: 5rem; border-radius: 0.5rem; object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                        <div class="icone-imagem">
+                                            <RadzenIcon Icon="restaurant" Style="@($"color: {(restaurante.CorPrimaria ?? "var(--rz-primary)")}; font-size: 2.5rem;")" />
+                                        </div>
+                                    }
+                                </RadzenStack>
+                            </Template>
+                        </RadzenDataList>
+                    }
+                </div>
+            </div>
+        </div>
+    </RadzenBody>
+    <RadzenFooter>
+        <div class="container">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0">
+                <span class="valor-total">@(pedidoProdutos.Sum(s => s.Valor).ToString("C", new System.Globalization.CultureInfo("pt-BR")))</span>
+                <RadzenButton Text="Ver Carrinho" />
+            </RadzenStack>
+        </div>
+    </RadzenFooter>
+</RadzenLayout>
+
+@code {
+
+    [Parameter]
+    public Mesa mesa { get; set; }
+
+    [Parameter]
+    public Restaurante restaurante { get; set; }
+
+    [Parameter]
+    public List<ProdutoCategoria> categorias { get; set; } = new List<ProdutoCategoria>();
+
+    [Parameter]
+    public List<PedidoProduto> pedidoProdutos { get; set; } = new List<PedidoProduto>();
+
+    public Pedido pedido = new Pedido();
+
+    public ProdutoCategoria categoriaAtual { get; set; }
+
+    protected override void OnInitialized()
+    {
+        categoriaAtual = categorias.First();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public async void AlteraCategoria()
+    {
+        var ordem = await Js.InvokeAsync<int>("GetCategoriaAtual");
+        if (categoriaAtual != categorias[ordem])
+        {
+            categoriaAtual = categorias[ordem];
+        }
+    }
+
+    public async void RedirecionaCategoria()
+    {
+        await Js.InvokeVoidAsync("RedirecionaCategoria", categoriaAtual.Id);
+    }
+
+    public async void AbrePopupPedidoProduto(Produto produto)
+    {
+        await DialogService.OpenAsync<PopupCardapioProdutoPedido>("Detalhe do Produto", new Dictionary<string, object>() { { "cardapioPedido", this }, { "restaurante", restaurante }, { "produto", produto } }, new DialogOptions() { Width = "100vw", Height = "100vh", Resizable = false, Draggable = false });
+    }
+
+    public void InserePedidoProduto(Produto produto, int quantidade, string observacao)
+    {
+        pedidoProdutos.Add(new PedidoProduto()
+        {
+            NomeProduto = produto.Nome,
+            ValorUnitario = produto.Valor,
+            RestauranteId = restaurante.Id,
+            PedidoId = pedido.Id,
+            Quantidade = quantidade,
+            Observacao = observacao,
+        });
+        StateHasChanged();
+    }
+
+}

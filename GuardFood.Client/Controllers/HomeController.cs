@@ -1,9 +1,12 @@
 ﻿using GuardFood.Core.Data.Interfaces;
 using GuardFood.Core.Data.ViewModel;
+using GuardFood.Core.Entities;
 using GuardFood.Core.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using QRCoder;
+using Rotativa.AspNetCore;
 using System.Diagnostics;
 
 namespace GuardFood.Client.Controllers
@@ -13,11 +16,13 @@ namespace GuardFood.Client.Controllers
     {
         private readonly UserManager<Usuario> _userManager;
         private readonly IRestauranteRepository _restauranteRepository;
+        private readonly IMesaRepository _mesaRepository;
 
-        public HomeController(UserManager<Usuario> userManager, IRestauranteRepository restauranteRepository)
+        public HomeController(UserManager<Usuario> userManager, IRestauranteRepository restauranteRepository, IMesaRepository mesaRepository)
         {
             _userManager = userManager;
             _restauranteRepository = restauranteRepository;
+            _mesaRepository = mesaRepository;
         }
 
         [AllowAnonymous]
@@ -44,15 +49,6 @@ namespace GuardFood.Client.Controllers
         {
             var restaurante = _restauranteRepository.GetById(_userManager.GetUserAsync(User).Result.RestauranteId);
             return View("~/Views/Restaurante/Configuracoes.cshtml", restaurante);
-        }
-
-        [AllowAnonymous]
-        [Route("/Cardapio")]
-        public IActionResult Cardapio(Guid id)
-        {
-            var restaurante = _restauranteRepository.GetById(id);
-            ViewData["Categorias"] = _restauranteRepository.GetCardapio(restaurante.Id);
-            return View("~/Views/Cardapio/Cardapio.cshtml", restaurante);
         }
 
         public IActionResult Privacy()

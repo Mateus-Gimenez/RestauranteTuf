@@ -13,5 +13,8 @@ namespace GuardFood.Core.Entities
     {
         [MaxLength(5)]
         public string Codigo { get; set; }
+
+        [NotMapped]
+        public string? Base64QrCode { get; set; }
     }
 }
