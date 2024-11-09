@@ -32,6 +32,8 @@ namespace GuardFood.Core.Entities
             Concluido = 2,
             [Description("Cancelado")]
             Cancelado = 3,
+            [Description("Entregue")]
+            Entregue = 4,
         }
 
         [NotMapped]

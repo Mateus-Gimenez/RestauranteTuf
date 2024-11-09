@@ -71,12 +71,21 @@
     {
         <RadzenSidebar @bind-Expanded="@sidebarExpanded" Responsive="true">
             <RadzenPanelMenu>
-                <RadzenPanelMenuItem Text="Home" Icon="home" Path="/Home/Dashboard" />
-                <RadzenPanelMenuItem Text="Produtos" Icon="inventory_2" Path="/Produto" />
-                <RadzenPanelMenuItem Text="Mesas" Icon="table_restaurant" Path="/Mesa" />
-                <RadzenPanelMenuItem Text="Pedidos" Icon="receipt_long" Path="/Pedido" />
-                <RadzenPanelMenuItem Text="Usuários" Icon="account_box" Path="/Usuario" />
-                <RadzenPanelMenuItem Text="Config. Restaurante" Icon="settings" Path="/Restaurante/Configuracoes" />
+                @if(usuario.Tipo == Usuario.TipoUsuario.Funcionario)
+                {
+                    <RadzenPanelMenuItem Text="Produtos" Icon="inventory_2" Path="/Produto" />
+                    <RadzenPanelMenuItem Text="Pedidos" Icon="receipt_long" Path="/Pedido" />
+                }
+                @if (usuario.Tipo == Usuario.TipoUsuario.Master)
+                {
+                    <RadzenPanelMenuItem Text="Mesas" Icon="table_restaurant" Path="/Mesa" />
+                    <RadzenPanelMenuItem Text="Usuários" Icon="account_box" Path="/Usuario" />
+                    <RadzenPanelMenuItem Text="Config. Restaurante" Icon="settings" Path="/Restaurante/Configuracoes" />
+                    <RadzenPanelMenuItem Text="Home" Icon="home" Path="/Home/Dashboard" />
+                    <RadzenPanelMenuItem Text="Produtos" Icon="inventory_2" Path="/Produto" />
+                    <RadzenPanelMenuItem Text="Pedidos" Icon="receipt_long" Path="/Pedido" />
+                }
+
             </RadzenPanelMenu>
         </RadzenSidebar>
     }
