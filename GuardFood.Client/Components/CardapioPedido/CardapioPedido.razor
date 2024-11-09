@@ -134,7 +134,7 @@
         <div class="container">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0">
                 <span class="valor-total">@(pedidoProdutos.Sum(s => s.Valor).ToString("C", new System.Globalization.CultureInfo("pt-BR")))</span>
-                <RadzenButton Text="Ver Carrinho" />
+                <RadzenButton Text="Ver Carrinho" Click="AbrePopupCarrinho" />
             </RadzenStack>
         </div>
     </RadzenFooter>
@@ -154,7 +154,8 @@
     [Parameter]
     public List<PedidoProduto> pedidoProdutos { get; set; } = new List<PedidoProduto>();
 
-    public Pedido pedido = new Pedido();
+    [Parameter]
+    public Pedido pedido { get; set; } = new Pedido();
 
     public ProdutoCategoria categoriaAtual { get; set; }
 
@@ -185,6 +186,11 @@
     public async void AbrePopupPedidoProduto(Produto produto)
     {
         await DialogService.OpenAsync<PopupCardapioProdutoPedido>("Detalhe do Produto", new Dictionary<string, object>() { { "cardapioPedido", this }, { "restaurante", restaurante }, { "produto", produto } }, new DialogOptions() { Width = "100vw", Height = "100vh", Resizable = false, Draggable = false });
+    }
+
+    public async void AbrePopupCarrinho()
+    {
+        await DialogService.OpenAsync<PopupCarrinho>("Detalhe do Produto", new Dictionary<string, object>() { { "cardapioPedido", this }, { "restaurante", restaurante }, { "pedido", pedido }, { "pedidoProdutos", pedidoProdutos } }, new DialogOptions() { Width = "100vw", Height = "100vh", Resizable = false, Draggable = false });
     }
 
     public void InserePedidoProduto(Produto produto, int quantidade, string observacao)

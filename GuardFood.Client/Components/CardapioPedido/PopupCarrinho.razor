@@ -1,5 +1,141 @@
-﻿<h3>PopupCarrinho</h3>
+﻿@using System.Linq.Dynamic.Core;
+@inject IJSRuntime JsRuntime;
+@inject DialogService DialogService;
+@inject IServiceScopeFactory scopeFactory;
+
+<style>
+
+    .icone-produto {
+        height: 100%;
+        width: 100%;
+        background-color: #eee;
+        border-radius: 0.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .produto-descricao-popup {
+        color: rgb(127, 143, 159);
+        font-size: 0.8rem;
+    }
+
+    .label-observacao {
+        font-weight: 800;
+        font-size: 1.125rem;
+        line-height: 1.688rem;
+        letter-spacing: 0.01em;
+        color: rgb(48, 51, 60);
+    }
+
+    .label-quantidade {
+        font-weight: 500;
+        font-size: 1.125rem;
+        line-height: 1.688rem;
+        letter-spacing: 0.01em;
+        color: rgb(48, 51, 60);
+    }
+
+</style>
+
+<div class="container">
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Center">
+        <RadzenRow Style="height: 25vh">
+            <RadzenDataList Data="pedidoProdutos" Density="Density.Compact" Style="width: 100%">
+                <Template Context="pedidoProduto">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                        <div class="produto-info">
+                            <div class="produto-nome">@(pedidoProduto.Quantidade)x @pedidoProduto.NomeProduto</div>
+                            <div class="produto-valor">@pedidoProduto.ValorUnitario</div>
+                            @if (!string.IsNullOrWhiteSpace(pedidoProduto.Observacao))
+                            {
+                                <div class="produto-valor">Observação: @pedidoProduto.Observacao</div>
+                            }
+                        </div>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                            @if (pedidoProduto.Quantidade == 1)
+                            {
+                                <RadzenButton Icon="delete" Click="() => RemovePedidoProduto(pedidoProduto)" />
+                            }
+                            else
+                            {
+                                <RadzenButton Text="-" Click="() => DiminuiQuantidade(pedidoProduto)" />
+                            }
+                            <span class="label-observacao">@(pedidoProduto.Quantidade)</span>
+                            <RadzenButton Text="+" Click="() => AumentaQuantidade(pedidoProduto)" />
+                        </RadzenStack>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataList>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Style="width: 100%">
+                <div class="produto-valor">Total:</div>
+                <div class="produto-valor">@(pedidoProdutos.Sum(s => s.Valor).ToString("C", new System.Globalization.CultureInfo("pt-BR")))</div>
+            </RadzenStack>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenButton Text="Adicionar mais produtos" Click="FechaPopup" Style="width: 100%" />
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenLabel Text="Nome e Sobrenome" class="label-observacao" />
+            <RadzenTextBox @bind-Value="NomeCliente" Placeholder="Como vamos te chamar" Style="width: 100%;" />
+        </RadzenRow>
+        <RadzenRow JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
+            <RadzenButton Text="Fazer Pedido" Click="FazerPedido" Disabled="!pedidoProdutos.Any()" />
+        </RadzenRow>
+    </RadzenStack>
+</div>
 
 @code {
+
+    [Parameter]
+    public CardapioPedido cardapioPedido { get; set; }
+
+    [Parameter]
+    public Restaurante restaurante { get; set; }
+
+    [Parameter]
+    public List<PedidoProduto> pedidoProdutos { get; set; }
+
+    [Parameter]
+    public Pedido pedido { get; set; }
+
+    public string NomeCliente { get; set; }
+
+    public void RemovePedidoProduto(PedidoProduto pedidoProduto)
+    {
+        pedidoProdutos.Remove(pedidoProduto);
+    }
+
+    public void DiminuiQuantidade(PedidoProduto pedidoProduto)
+    {
+        pedidoProdutos.First(f => f.Id == pedidoProduto.Id).Quantidade--;
+    }
+
+    public void AumentaQuantidade(PedidoProduto pedidoProduto)
+    {
+        pedidoProdutos.First(f => f.Id == pedidoProduto.Id).Quantidade++;
+    }
+
+    public void FechaPopup()
+    {
+        DialogService.Close();
+    }
+
+    public async Task FazerPedido()
+    {
+        if (string.IsNullOrWhiteSpace(NomeCliente))
+        {
+            await JsRuntime.InvokeVoidAsync("notifica", "", "Preencha seu nome e sobrenome para prosseguir", false);
+            return;
+        }
+
+        using(var scope = scopeFactory.CreateScope())
+        {
+            var retorno = scope.ServiceProvider.GetRequiredService<IPedidoRepository>().InserePedido(pedido, pedidoProdutos);
+        }
+
+    }
 
 }

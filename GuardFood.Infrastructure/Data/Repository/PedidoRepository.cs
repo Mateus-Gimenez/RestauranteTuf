@@ -24,5 +24,23 @@ namespace GuardFood.Core.Data.Repository
                 return new RetornoViewModel() { Sucesso = false, Mensagem = e.Message };
             }
         }
+
+        public RetornoViewModel InserePedido(Pedido pedido, List<PedidoProduto> pedidoProdutos) 
+        {
+            try
+            {
+                _context.Pedidos.Add(pedido);
+                _context.PedidoProdutos.AddRange(pedidoProdutos);
+
+                _context.SaveChanges();
+
+                return new RetornoViewModel() { Sucesso = true,  Mensagem = "Pedido realizado com sucesso" };
+            }
+            catch (Exception e)
+            {
+                return new RetornoViewModel() { Sucesso = false, Mensagem = e.Message };
+            }
+        }
+
     }
 }

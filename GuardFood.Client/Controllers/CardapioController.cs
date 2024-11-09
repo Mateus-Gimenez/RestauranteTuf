@@ -39,8 +39,15 @@ namespace GuardFood.Client.Controllers
             var mesa = _mesaRepository.BuscarPorId(Mesa);
             var restaurante = _restauranteRepository.GetById(mesa.RestauranteId);
             mesa.Restaurante = restaurante;
+
+            var pedido = new Pedido() { RestauranteId = restaurante.Id, MesaId = mesa.Id };
+
+            var pedidoProdutos = new List<PedidoProduto>();
+
             ViewData["Categorias"] = _restauranteRepository.GetCardapio(restaurante.Id);
-            ViewData["PedidoProdutos"] = new List<PedidoProduto>();
+            ViewData["Pedido"] = pedido;
+            ViewData["PedidoProdutos"] = pedidoProdutos;
+
             return View(mesa);
         }
 
