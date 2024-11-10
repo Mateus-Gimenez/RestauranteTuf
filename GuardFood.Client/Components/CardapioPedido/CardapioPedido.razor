@@ -15,6 +15,12 @@
         background-color: @((!string.IsNullOrEmpty(restaurante.CorPrimaria) ? restaurante.CorPrimaria : "var(--rz-primary)")) !important;
     }
 
+    .rz-button.rz-variant-outlined.rz-primary.rz-shade-default {
+        background-color: transparent !important;
+        color: @((!string.IsNullOrEmpty(restaurante.CorPrimaria) ? restaurante.CorPrimaria : "var(--rz-primary)")) !important;
+        box-shadow: inset 0 0 0 var(--rz-border-width) @((!string.IsNullOrEmpty(restaurante.CorPrimaria) ? restaurante.CorPrimaria : "var(--rz-primary)")) !important;
+    }
+
     .rz-dropdown-items .rz-state-highlight {
         font-weight: 700 !important;
         color: black !important;
@@ -28,7 +34,7 @@
     .icone-imagem {
         height: 5rem;
         width: 5rem;
-        background-color: #ccc;
+        background-color: #eee;
         border-radius: 0.5rem;
         display: flex;
         justify-content: center;
@@ -97,7 +103,7 @@
             <RadzenDropDown @bind-Value="categoriaAtual" Change="RedirecionaCategoria" Data=@categorias TextProperty="@nameof(ProdutoCategoria.Nome)" Style="width: 100%;" />
         </RadzenStack>
     </RadzenHeader>
-    <RadzenBody @onscroll="AlteraCategoria">
+    <RadzenBody @onscroll="AlteraCategoria" Style="height: 75vh;">
         <div id="corpo-principal" class="rz-p-4">
             <div class="container">
                 <div id="group-list">
@@ -130,7 +136,7 @@
             </div>
         </div>
     </RadzenBody>
-    <RadzenFooter>
+    <RadzenFooter >
         <div class="container">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0">
                 <span class="valor-total">@(pedidoProdutos.Sum(s => s.Valor).ToString("C", new System.Globalization.CultureInfo("pt-BR")))</span>
@@ -169,6 +175,11 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
+    public void AtualizaTelaPedido()
+    {
+        StateHasChanged();
+    }
+
     public async void AlteraCategoria()
     {
         var ordem = await Js.InvokeAsync<int>("GetCategoriaAtual");
@@ -190,7 +201,7 @@
 
     public async void AbrePopupCarrinho()
     {
-        await DialogService.OpenAsync<PopupCarrinho>("Detalhe do Produto", new Dictionary<string, object>() { { "cardapioPedido", this }, { "restaurante", restaurante }, { "pedido", pedido }, { "pedidoProdutos", pedidoProdutos } }, new DialogOptions() { Width = "100vw", Height = "100vh", Resizable = false, Draggable = false });
+        await DialogService.OpenAsync<PopupCarrinho>("Detalhe do Produto", new Dictionary<string, object>() { { "cardapioPedido", this }, { "restaurante", restaurante }, { "pedido", pedido }, { "pedidoProdutos", pedidoProdutos } }, new DialogOptions() { Width = "100vw", Height = "100vh", Resizable = false, Draggable = false, ShowClose = false });
     }
 
     public void InserePedidoProduto(Produto produto, int quantidade, string observacao)

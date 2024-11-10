@@ -16,6 +16,8 @@ namespace GuardFood.Core.Entities
 
         public string NomeCliente { get; set; }
 
+        public string Telefone { get; set; }
+
         [ForeignKey("Mesa")]
         public Guid MesaId { get; set; }
         public Mesa Mesa { get; set; }

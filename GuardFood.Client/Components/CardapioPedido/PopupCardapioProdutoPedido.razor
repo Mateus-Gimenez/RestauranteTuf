@@ -77,9 +77,9 @@
         </RadzenRow>
         <RadzenRow JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-                <RadzenButton Text="-" Disabled="quantidade == 1" Click="DiminuiQuantidade" />
+                <RadzenButton Icon="remove" Disabled="quantidade == 1" Click="DiminuiQuantidade" />
                 <span class="label-observacao">@(quantidade)</span>
-                <RadzenButton Text="+" Click="AumentaQuantidade" />
+                <RadzenButton Icon="add" Click="AumentaQuantidade" />
             </RadzenStack>
             <RadzenButton Text="Adicionar" Click="AdicionarPedidoProduto" />
         </RadzenRow>
