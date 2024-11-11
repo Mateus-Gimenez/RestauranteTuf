@@ -39,12 +39,59 @@ namespace GuardFood.Core.Entities
         }
 
         [NotMapped]
+        public string StatusDescricao
+        {
+            get
+            {
+                return Common.GetEnumDescription(Status);
+            }
+        }
+
+        [NotMapped]
         public string CodigoFormatado
         {
             get
             {
                 return Codigo.ToString("00000");
             }
-        } 
+        }
+
+        [NotMapped]
+        public string CorStatus
+        {
+            get
+            {
+                switch (Status)
+                {
+                    case StatusPedido.Recebido: return "var(--rz-base-700)";
+                    case StatusPedido.EmAndamento: return "var(--rz-warning)";
+                    case StatusPedido.Concluido: return "var(--rz-info)";
+                    case StatusPedido.Cancelado: return "var(--rz-danger)";
+                    case StatusPedido.Entregue: return "var(--rz-success)";
+                    default: return "#ccc";
+                }
+            }
+        }
+
+        [NotMapped]
+        public string TelefoneFormatado
+        {
+            get
+            {
+                try
+                {
+                    if(Telefone?.Length != 11)
+                    {
+                        return Telefone;
+                    }
+
+                    return Convert.ToUInt64(Telefone).ToString(@"(00) 00000-0000");
+                }
+                catch (Exception)
+                {
+                    return Telefone;
+                }
+            }
+        }
     }
 }

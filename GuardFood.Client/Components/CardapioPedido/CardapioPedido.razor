@@ -15,6 +15,11 @@
         background-color: @((!string.IsNullOrEmpty(restaurante.CorPrimaria) ? restaurante.CorPrimaria : "var(--rz-primary)")) !important;
     }
 
+    .rz-button.rz-base.rz-shade-default {
+        background-color: var(--rz-base) !important;
+        color: var(--rz-on-base) !important;
+    }
+
     .rz-button.rz-variant-outlined.rz-primary.rz-shade-default {
         background-color: transparent !important;
         color: @((!string.IsNullOrEmpty(restaurante.CorPrimaria) ? restaurante.CorPrimaria : "var(--rz-primary)")) !important;
@@ -103,9 +108,12 @@
             <RadzenDropDown @bind-Value="categoriaAtual" Change="RedirecionaCategoria" Data=@categorias TextProperty="@nameof(ProdutoCategoria.Nome)" Style="width: 100%;" />
         </RadzenStack>
     </RadzenHeader>
-    <RadzenBody @onscroll="AlteraCategoria" Style="height: 75vh;">
+    <RadzenBody @onscroll="AlteraCategoria">
         <div id="corpo-principal" class="rz-p-4">
             <div class="container">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center">
+                    <RadzenButton Text="Ver Pedidos" Variant="Variant.Outlined" Click="RedirecionaStatusPedido" />
+                </RadzenStack>
                 <div id="group-list">
                     @foreach (var c in categorias)
                     {
@@ -189,6 +197,11 @@
         }
     }
 
+    public async void RedirecionaStatusPedido()
+    {
+        await Js.InvokeVoidAsync("abreTela", $"/StatusPedido?restauranteId={restaurante.Id}");
+    }
+
     public async void RedirecionaCategoria()
     {
         await Js.InvokeVoidAsync("RedirecionaCategoria", categoriaAtual.Id);
@@ -208,6 +221,7 @@
     {
         pedidoProdutos.Add(new PedidoProduto()
         {
+            ProdutoId = produto.Id,
             NomeProduto = produto.Nome,
             ValorUnitario = produto.Valor,
             RestauranteId = restaurante.Id,
@@ -216,6 +230,25 @@
             Observacao = observacao,
         });
         StateHasChanged();
+        SalvaInfoPedido();
+    }
+
+    public async void SalvaInfoPedido()
+    {
+        var pedidoViewModel = new PedidoViewModel() { NomeCliente = pedido.NomeCliente, Telefone = pedido.Telefone };
+        var pedidoProdutoViewmodel = new List<PedidoProdutoViewModel>();
+        foreach(var pp in pedidoProdutos)
+        {
+            pedidoProdutoViewmodel.Add(new PedidoProdutoViewModel()
+            {
+                ProdutoId = pp.ProdutoId,
+                Observacao = pp.Observacao,
+                Quantidade = pp.Quantidade
+            });
+        }
+
+        var json = JsonConvert.SerializeObject(new PedidoInfoViewModel() { Pedido = pedidoViewModel, PedidoProdutos = pedidoProdutoViewmodel });
+        await Js.InvokeVoidAsync("getDados", "/SalvaInfoPedido", new { pedidoInfoViewModel = json, restauranteId = restaurante.Id }, "POST");
     }
 
 }

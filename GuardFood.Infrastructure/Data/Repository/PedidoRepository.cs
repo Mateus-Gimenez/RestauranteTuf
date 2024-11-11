@@ -2,6 +2,7 @@
 using GuardFood.Core.Entities;
 using GuardFood.Core.Context;
 using GuardFood.Core.Data.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace GuardFood.Core.Data.Repository
 {
@@ -9,20 +10,9 @@ namespace GuardFood.Core.Data.Repository
     {
         public PedidoRepository(GFContext context) : base(context) { }
 
-        public RetornoViewModel CancelarPedido(Pedido pedido)
+        public IEnumerable<Pedido> GetByTelefone(Guid restauranteId, string telefone)
         {
-            try
-            {
-                pedido.Status = Pedido.StatusPedido.Cancelado;
-                _context.Pedidos.Update(pedido).Property(x => x.Codigo).IsModified = false;
-                _context.SaveChanges();
-
-                return new RetornoViewModel() { Sucesso = true };
-            }
-            catch(Exception e)
-            {
-                return new RetornoViewModel() { Sucesso = false, Mensagem = e.Message };
-            }
+            return _context.Pedidos.Include(i => i.Mesa).Where(w => w.Ativo && w.RestauranteId == restauranteId && w.Telefone == telefone).OrderByDescending(o => o.Alteracao).ToList();
         }
 
         public RetornoViewModel InserePedido(Pedido pedido, List<PedidoProduto> pedidoProdutos) 

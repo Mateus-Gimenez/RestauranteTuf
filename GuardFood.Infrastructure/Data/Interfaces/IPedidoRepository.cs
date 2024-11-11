@@ -5,7 +5,7 @@ namespace GuardFood.Core.Data.Interfaces
 {
     public interface IPedidoRepository : IRepository<Pedido>
     {
-        RetornoViewModel CancelarPedido(Pedido pedido);
+        IEnumerable<Pedido> GetByTelefone(Guid restauranteId, string telefone);
         RetornoViewModel InserePedido(Pedido pedido, List<PedidoProduto> pedidoProdutos);
     }
 }

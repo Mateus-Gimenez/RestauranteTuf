@@ -1,12 +1,19 @@
 ﻿@inject IJSRuntime JsRuntime;
 @inject DialogService DialogService;
+@inject IServiceScopeFactory scopeFactory;
 
 <style>
 
-    .card-home:hover {
-        background-color: var(--rz-secondary) !important;
+    .card-home i, .card-home h6 {
+        color: var(--rz-text-color);
+    }
+
+    .card-home:hover, .card-home:hover i, .card-home:hover h6 {
+        background-color: @((!string.IsNullOrEmpty(restaurante.CorPrimaria) ? restaurante.CorPrimaria : "var(--rz-primary)")) !important;
+        color: var(--rz-header-color) !important;
         cursor: pointer !important;
     }
+
 </style>
 
 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
@@ -21,7 +28,7 @@
         <RadzenColumn Size="12" SizeMD="4">
             <div onclick="redirecionaTela('/Pedido')">
                 <RadzenCard Style="width: 100%;" Class="rz-border-radius-3 text-center card-home">
-                    <RadzenIcon Icon="assignment" Style="font-size: 2.5rem; color: var(--rz-text-color)" />
+                    <RadzenIcon Icon="assignment" Style="font-size: 2.5rem;" />
                     <RadzenText TextStyle="TextStyle.Subtitle1">Pedidos</RadzenText>
                 </RadzenCard>
             </div>
@@ -29,7 +36,7 @@
         <RadzenColumn Size="12" SizeMD="4">
             <div onclick="redirecionaTela('/Produto')">
                 <RadzenCard Style="width: 100%;" Class="rz-border-radius-3 text-center card-home">
-                    <RadzenIcon Icon="inventory_2" Style="font-size: 2.5rem; color: var(--rz-text-color)" />
+                    <RadzenIcon Icon="inventory_2" Style="font-size: 2.5rem;" />
                     <RadzenText TextStyle="TextStyle.Subtitle1">Produtos</RadzenText>
                 </RadzenCard>
             </div>
@@ -37,7 +44,7 @@
         <RadzenColumn Size="12" SizeMD="4">
             <div onclick="redirecionaTela('/Mesa')">
                 <RadzenCard Style="width: 100%;" Class="rz-border-radius-3 text-center card-home">
-                    <RadzenIcon Icon="table_restaurant" Style="font-size: 2.5rem; color: var(--rz-text-color)" />
+                    <RadzenIcon Icon="table_restaurant" Style="font-size: 2.5rem;" />
                     <RadzenText TextStyle="TextStyle.Subtitle1">Mesas</RadzenText>
                 </RadzenCard>
             </div>
@@ -58,6 +65,16 @@
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenLabel><b>Produtos mais pedidos no mês</b></RadzenLabel>
+            <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
+                <div>
+                    <RadzenLabel Text="Dt. Início" />
+                    <RadzenDatePicker @bind-Value=@dataInicio DateFormat="dd/MM/yyyy" Change="AtualizaGraficoProdutos" />
+                </div>
+                <div>
+                    <RadzenLabel Text="Dt. Fim" />
+                    <RadzenDatePicker @bind-Value=@dataFim DateFormat="dd/MM/yyyy" Change="AtualizaGraficoProdutos" />
+                </div>
+            </RadzenRow>
             <RadzenChart>
                 <RadzenPieSeries Data="@QuantidadesProdutos" CategoryProperty="Nome" ValueProperty="Quantidade" Title="Quantidade">
                     <RadzenSeriesDataLabels Visible="@false" />
@@ -68,8 +85,21 @@
 </RadzenStack>
 
 @code {
+
     [Parameter]
-    public Guid restauranteId { get; set; }
+    public Restaurante restaurante { get; set; }
+
+    public List<int> anoPedidos { get; set; } = new List<int>() { DateTime.Now.Year };
+    public DateTime dataInicio { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    public DateTime dataFim { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1);
+
+    QuantidadeProduto[] QuantidadesProdutos = new QuantidadeProduto[] { };
+
+    protected override void OnInitialized()
+    {
+        AtualizaGraficoPedidos();
+        AtualizaGraficoProdutos();
+    }
 
     string FormataMoeda(object value)
     {
@@ -88,33 +118,38 @@
         public string Nome { get; set; }
     }
 
-    ValorVendasMes[] ValorVendas = new ValorVendasMes[]
-    {
-        new ValorVendasMes { Mes = "JAN", Valor = (decimal)125843.43 },
-        new ValorVendasMes { Mes = "FEV", Valor = (decimal)134523.89 },
-        new ValorVendasMes { Mes = "MAR", Valor = (decimal)145672.50 },
-        new ValorVendasMes { Mes = "ABR", Valor = (decimal)120342.10 },
-        new ValorVendasMes { Mes = "MAI", Valor = (decimal)137865.75 },
-        new ValorVendasMes { Mes = "JUN", Valor = (decimal)128934.67 },
-        new ValorVendasMes { Mes = "JUL", Valor = (decimal)139275.90 },
-        new ValorVendasMes { Mes = "AGO", Valor = (decimal)142365.55 },
-        new ValorVendasMes { Mes = "SET", Valor = (decimal)130432.88 },
-        new ValorVendasMes { Mes = "OUT", Valor = (decimal)136784.12 },
-        new ValorVendasMes { Mes = "NOV", Valor = (decimal)148293.23 },
-        new ValorVendasMes { Mes = "DEZ", Valor = (decimal)152374.34 }
-    };
+    ValorVendasMes[] ValorVendas = new ValorVendasMes[] { };
 
-    QuantidadeProduto[] QuantidadesProdutos = new QuantidadeProduto[]
+    public void AtualizaGraficoPedidos()
     {
-        new QuantidadeProduto { Nome = "Filé de Frango Grelhado", Quantidade = 25 },
-        new QuantidadeProduto { Nome = "Salmão ao Molho de Maracujá", Quantidade = 15 },
-        new QuantidadeProduto { Nome = "Lasanha de Carne", Quantidade = 30 },
-        new QuantidadeProduto { Nome = "Feijoada Completa", Quantidade = 20 },
-        new QuantidadeProduto { Nome = "Strogonoff de Frango", Quantidade = 28 },
-        new QuantidadeProduto { Nome = "Bife à Parmegiana", Quantidade = 18 },
-        new QuantidadeProduto { Nome = "Spaghetti ao Pesto", Quantidade = 22 },
-        new QuantidadeProduto { Nome = "Pizza Marguerita", Quantidade = 10 },
-        new QuantidadeProduto { Nome = "Hambúrguer Artesanal", Quantidade = 52 },
-        new QuantidadeProduto { Nome = "Risoto de Cogumelos", Quantidade = 12 }
-    };
+        using (var scope = scopeFactory.CreateScope())
+        {
+            var pedidos = scope.ServiceProvider.GetRequiredService<IPedidoProdutoRepository>().GetDashboard(restaurante.Id);
+            ValorVendas = pedidos.GroupBy(g => g.Inclusao.Month).OrderBy(o => o.Key).Select(s => new ValorVendasMes()
+            {
+                Mes = new System.Globalization.CultureInfo("pt-BR").DateTimeFormat.GetAbbreviatedMonthName(s.Key).ToUpper().Replace(".", ""),
+                Valor = s.Sum(sum => sum.Valor)
+            }).ToArray();
+        }
+    }
+
+    public void AtualizaGraficoProdutos()
+    {
+        using (var scope = scopeFactory.CreateScope())
+        {
+            if(dataInicio > dataFim)
+            {
+                var dateFim = dataInicio;
+                dataInicio = dataFim;
+                dataFim = dateFim;
+            }
+
+            var pedidos = scope.ServiceProvider.GetRequiredService<IPedidoProdutoRepository>().GetDashboard(restaurante.Id).Where(w => dataInicio <= w.Inclusao && w.Inclusao <= dataFim);
+            QuantidadesProdutos = pedidos.GroupBy(g => g.Produto).Select(s => new QuantidadeProduto()
+            {
+                Nome = s.Key.Nome,
+                Quantidade = s.Sum(sum => sum.Quantidade)
+            }).ToArray();
+        }
+    }
 }
