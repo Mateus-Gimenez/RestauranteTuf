@@ -10,5 +10,6 @@ namespace GuardFood.Core.Data.Interfaces
     public interface IPedidoProdutoRepository : IRepository<PedidoProduto>
     {
         IEnumerable<PedidoProduto> GetByPedidoId(Guid pedidoId);
+        IEnumerable<PedidoProduto> GetDashboard(Guid restauranteId);
     }
 }

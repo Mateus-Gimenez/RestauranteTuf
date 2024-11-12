@@ -1,0 +1,126 @@
+﻿@inject IJSRuntime Js;
+@inject DialogService DialogService;
+@inject IServiceScopeFactory scopeFactory;
+
+<style>
+
+    .rz-sidebar {
+        z-index: 999 !important;
+    }
+
+    .rz-button.rz-variant-outlined.rz-primary.rz-shade-default {
+        background-color: transparent !important;
+        color: @((!string.IsNullOrEmpty(restaurante.CorPrimaria) ? restaurante.CorPrimaria : "var(--rz-primary)")) !important;
+        box-shadow: inset 0 0 0 var(--rz-border-width) @((!string.IsNullOrEmpty(restaurante.CorPrimaria) ? restaurante.CorPrimaria : "var(--rz-primary)")) !important;
+    }
+
+    .rz-button {
+        background-color: @((!string.IsNullOrEmpty(restaurante.CorPrimaria) ? restaurante.CorPrimaria : "var(--rz-primary)")) !important;
+    }
+
+    .rz-dropdown-items .rz-state-highlight {
+        font-weight: 700 !important;
+        color: black !important;
+        background-color: #0000001f !important;
+    }
+
+    .icone-imagem {
+        height: 5rem;
+        width: 5rem;
+        background-color: #ccc;
+        border-radius: 0.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #lista-pedidos li {
+        background-color: transparent !important;
+        border: none !important;
+    }
+
+    .label-codigo {
+        font-weight: 800;
+        font-size: 1rem;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+    }
+
+</style>
+
+<RadzenComponents />
+
+<RadzenLayout>
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0" Style="height: 100%;">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Style="padding-left:1rem; height: 100%">
+                @if (restaurante?.MidiaId == null)
+                {
+                    <RadzenIcon Icon="restaurant" Style="color: var(--rz-header-color); padding-right: 1rem" />
+                }
+                else
+                {
+                    <RadzenImage Path="@("/Midia/GetMidia?id=" + restaurante.MidiaId)" class="rz-gravatar" Style="margin-right:0.5rem;" />
+                }
+                <RadzenLabel Text="@restaurante?.Nome" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenBody>
+        <div id="corpo-principal" class="rz-p-4">
+            <div class="container">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+                    <RadzenLabel><h4>Pedidos - @(telefoneFormatado)</h4></RadzenLabel>
+                </RadzenStack>
+
+                <RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
+                    <RadzenDataList id="lista-pedidos" Data="pedidos" Density="Density.Compact" Style="width: 100%">
+                        <Template Context="pedido">
+                            <RadzenCard Style="@($"border: 1px solid #ddd; border-left: 0.3rem solid {pedido.CorStatus}")">
+                                <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                                    <span class="label-codigo">#@pedido.CodigoFormatado</span>
+                                    <RadzenButton Icon="search" Click="() => AbrePopupDetalhePedido(pedido)" />
+                                </RadzenStack>
+                                <span style="color:@(pedido.CorStatus);font-weight: 600;">@(Common.GetEnumDescription(pedido.Status))</span> <br />
+                                <span><b>Mesa:</b> @pedido?.Mesa?.Codigo</span> <br />
+                                <span><b>Data:</b> @pedido.Inclusao.ToString("dd/MM/yyyy HH:mm")</span>
+                            </RadzenCard>
+                        </Template>
+                    </RadzenDataList>
+                </RadzenStack>
+            </div>
+        </div>
+    </RadzenBody>
+</RadzenLayout>
+
+@code {
+
+    [Parameter]
+    public Restaurante restaurante { get; set; }
+
+    [Parameter]
+    public IEnumerable<Pedido> pedidos { get; set; } = new List<Pedido>();
+
+    [Parameter]
+    public string telefone { get; set; }
+
+    [Parameter]
+    public string telefoneFormatado { get; set; }
+
+    public void GetPedidos()
+    {
+        using (var scope = scopeFactory.CreateScope())
+        {
+            pedidos = scope.ServiceProvider.GetRequiredService<IPedidoRepository>().GetByTelefone(restaurante.Id, telefone);
+        }
+    }
+
+    public async void AbrePopupDetalhePedido(Pedido pedidoDetalhe)
+    {
+        var popupPedidoDetalhe = new Pedido();
+        JsonConvert.PopulateObject(JsonConvert.SerializeObject(pedidoDetalhe), popupPedidoDetalhe);
+        await DialogService.OpenAsync<PopupDetalhePedido>($"Detalhe do Pedido #{pedidoDetalhe.CodigoFormatado}", new Dictionary<string, object>() { { "listaPedido", this }, { "restaurante", restaurante }, { "pedido", popupPedidoDetalhe } }, new DialogOptions() { Width = "100vw", Height = "100vh", Resizable = false, Draggable = false, ShowClose = true });
+    }
+
+}

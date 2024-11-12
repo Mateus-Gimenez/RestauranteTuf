@@ -33,7 +33,7 @@ namespace GuardFood.Client.Controllers
 
         public IActionResult Dashboard()
         {
-            ViewData["RestauranteId"] = _userManager.GetUserAsync(User).Result.RestauranteId;
+            ViewData["Restaurante"] = _restauranteRepository.GetById(_userManager.GetUserAsync(User).Result.RestauranteId);
             return View();
         }
 

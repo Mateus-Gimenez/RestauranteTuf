@@ -1,0 +1,105 @@
+﻿@inject IJSRuntime Js;
+@inject DialogService DialogService;
+
+<style>
+
+    .rz-sidebar {
+        z-index: 999 !important;
+    }
+
+    .rz-button.rz-variant-outlined.rz-primary.rz-shade-default {
+        background-color: transparent !important;
+        color: @((!string.IsNullOrEmpty(restaurante.CorPrimaria) ? restaurante.CorPrimaria : "var(--rz-primary)")) !important;
+        box-shadow: inset 0 0 0 var(--rz-border-width) @((!string.IsNullOrEmpty(restaurante.CorPrimaria) ? restaurante.CorPrimaria : "var(--rz-primary)")) !important;
+    }
+
+    .rz-button {
+        background-color: @((!string.IsNullOrEmpty(restaurante.CorPrimaria) ? restaurante.CorPrimaria : "var(--rz-primary)")) !important;
+    }
+
+    .rz-dropdown-items .rz-state-highlight {
+        font-weight: 700 !important;
+        color: black !important;
+        background-color: #0000001f !important;
+    }
+
+    .icone-imagem {
+        height: 5rem;
+        width: 5rem;
+        background-color: #ccc;
+        border-radius: 0.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+</style>
+
+<RadzenComponents />
+
+<RadzenLayout>
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0" Style="height: 100%;">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Style="padding-left:1rem; height: 100%">
+                @if (restaurante?.MidiaId == null)
+                {
+                    <RadzenIcon Icon="restaurant" Style="color: var(--rz-header-color); padding-right: 1rem" />
+                }
+                else
+                {
+                    <RadzenImage Path="@("/Midia/GetMidia?id=" + restaurante.MidiaId)" class="rz-gravatar" Style="margin-right:0.5rem;" />
+                }
+                <RadzenLabel Text="@restaurante?.Nome" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenBody>
+        <div id="corpo-principal" class="rz-p-4" style="height: 100%">
+            <div class="container" style="height: 100%">
+                <RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Style="height: 100%">
+                    <RadzenCard  Style="margin-bottom: 5rem;">
+                        <RadzenRow>
+                            <span style=" text-align: center; font-weight: 500;">Digite o seu número de celular para ver o status do seu pedido</span>
+                        </RadzenRow>
+                        <RadzenRow Style="margin-top: 1rem">
+                            <RadzenMask @bind-Value="Telefone" Mask="(**) *****-****" CharacterPattern="[0-9]" Placeholder="(00) 00000-0000" Style="width: 100%;" />
+                        </RadzenRow>
+                        <RadzenRow JustifyContent="JustifyContent.Center" Style="margin-top: 1rem">
+                            <RadzenButton Text="Continuar" Click="RedirecionaStatusPedido" />
+                        </RadzenRow>
+                    </RadzenCard>
+                </RadzenStack>
+            </div>
+        </div>
+    </RadzenBody>
+</RadzenLayout>
+
+@code {
+
+    [Parameter]
+    public Restaurante restaurante { get; set; }
+
+    public string Telefone { get; set; }
+
+    public async void RedirecionaStatusPedido()
+    {
+        var numeros = new List<char>() { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        var telefone = "";
+
+        foreach (var t in Telefone)
+        {
+            if (numeros.Contains(t))
+            {
+                telefone += t;
+            }
+        }
+
+        if(telefone.Length != 11)
+        {
+            await Js.InvokeVoidAsync("notifica", "Erro", "Número de Celular inválido", false);
+            return;
+        }
+
+        await Js.InvokeVoidAsync("redirecionaTela", $"/StatusPedido?restauranteId={restaurante.Id}&telefone={telefone}");
+    }
+}

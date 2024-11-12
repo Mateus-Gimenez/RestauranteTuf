@@ -1,0 +1,50 @@
+﻿@inject GuardFood.Core.Data.Interfaces.IRestauranteRepository restauranteRepository;
+@model Restaurante
+
+@{
+    Layout = "";
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+    <title>Pedidos - @(Model.Nome)</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/GuardFood.Client.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/iziToast/iziToast.css" asp-append-version="true" />
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)" id="temaBlazor">
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/iziToast/iziToast.js" asp-append-version="true"></script>
+
+    <style>
+
+        .rz-dropdown-clear-icon {
+            margin-right: 1rem;
+        }
+
+        .rz-header .rz-profile-menu {
+            background-color: transparent !important;
+        }
+
+        .rz-layout > .rz-header, .rz-sidebar-toggle:hover {
+            background-color: @Html.Raw(string.IsNullOrEmpty(Model?.CorPrimaria) ? "var(--rz-header-background-color)" : Model?.CorPrimaria) !important;
+        }
+
+    </style>
+</head>
+<body>
+
+    <component type="typeof(GuardFood.Client.Components.StatusPedido.InserirTelefone)" render-mode="Server" param-restaurante="Model" />
+
+    <script src="_framework/blazor.server.js"></script>
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)" asp-append-version="true"></script>
+
+</body>
+</html>

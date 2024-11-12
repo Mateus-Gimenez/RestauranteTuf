@@ -5,6 +5,25 @@
 
 <style>
 
+    #lista-carrinho::-webkit-scrollbar-thumb, .rz-dialog ::-webkit-scrollbar-thumb, .rz-scrollbars::-webkit-scrollbar-thumb, .rz-scrollbars ::-webkit-scrollbar-thumb {
+        background: var(--rz-scrollbar-color);
+        border: 4px solid rgba(0, 0, 0, 0);
+        background-clip: padding-box;
+        border-radius: var(--rz-scrollbar-border-radius);
+        min-width: var(--rz-scrollbar-size);
+        min-height: var(--rz-scrollbar-size);
+    }
+
+    #lista-carrinho::-webkit-scrollbar, .rz-dialog ::-webkit-scrollbar, .rz-scrollbars::-webkit-scrollbar, .rz-scrollbars ::-webkit-scrollbar {
+        background-color: var(--rz-scrollbar-background-color);
+        width: var(--rz-scrollbar-size);
+        height: var(--rz-scrollbar-size);
+    }
+
+    #lista-carrinho::-webkit-scrollbar-corner, .rz-dialog ::-webkit-scrollbar-corner, .rz-scrollbars::-webkit-scrollbar-corner, .rz-scrollbars ::-webkit-scrollbar-corner {
+        background-color: var(--rz-scrollbar-background-color);
+    }
+
     .icone-produto {
         height: 100%;
         width: 100%;
@@ -28,6 +47,13 @@
         color: rgb(48, 51, 60);
     }
 
+    .label-nome-celular {
+        font-weight: 600;
+        font-size: 1rem;
+        line-height: 0.5rem;
+        color: rgb(48, 51, 60);
+    }
+
     .label-quantidade {
         font-weight: 500;
         font-size: 1.125rem;
@@ -35,21 +61,20 @@
         letter-spacing: 0.01em;
         color: rgb(48, 51, 60);
     }
-
 </style>
 
 <div class="container">
     <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Center">
-        <RadzenRow Style="height: 25vh">
-            <RadzenDataList Data="pedidoProdutos" Density="Density.Compact" Style="width: 100%">
+        <RadzenRow id="lista-carrinho" Style="height: 35vh; overflow: auto">
+            <RadzenDataList Data="pedidoProdutos" Density="Density.Compact" EmptyText="Seu carrinho está vazio!" Style="width: 100%" ShowEmptyMessage="true">
                 <Template Context="pedidoProduto">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
                         <div class="produto-info">
                             <div class="produto-nome">@(pedidoProduto.Quantidade)x @pedidoProduto.NomeProduto</div>
-                            <div class="produto-valor">@pedidoProduto.ValorUnitario</div>
+                            <div class="produto-valor" style="margin-top: 0.5rem">@pedidoProduto.ValorFormatado</div>
                             @if (!string.IsNullOrWhiteSpace(pedidoProduto.Observacao))
                             {
-                                <div class="produto-valor">Observação: @pedidoProduto.Observacao</div>
+                                <div class="produto-descricao" style="margin-top: 0.5rem">Obs: @pedidoProduto.Observacao</div>
                             }
                         </div>
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
@@ -59,10 +84,10 @@
                             }
                             else
                             {
-                                <RadzenButton Text="-" Click="() => DiminuiQuantidade(pedidoProduto)" />
+                                <RadzenButton Icon="remove" Click="() => DiminuiQuantidade(pedidoProduto)" />
                             }
                             <span class="label-observacao">@(pedidoProduto.Quantidade)</span>
-                            <RadzenButton Text="+" Click="() => AumentaQuantidade(pedidoProduto)" />
+                            <RadzenButton Icon="add" Click="() => AumentaQuantidade(pedidoProduto)" />
                         </RadzenStack>
                     </RadzenStack>
                 </Template>
@@ -75,14 +100,18 @@
             </RadzenStack>
         </RadzenRow>
         <RadzenRow>
-            <RadzenButton Text="Adicionar mais produtos" Click="FechaPopup" Style="width: 100%" />
+            <RadzenButton Text="Adicionar mais produtos" Click="FechaPopup" Variant="Variant.Outlined" Style="width: 100%" />
         </RadzenRow>
         <RadzenRow>
-            <RadzenLabel Text="Nome e Sobrenome" class="label-observacao" />
-            <RadzenTextBox @bind-Value="NomeCliente" Placeholder="Como vamos te chamar" Style="width: 100%;" />
+            <RadzenLabel Text="Nome e Sobrenome" class="label-nome-celular" />
+            <RadzenTextBox @bind-Value="pedido.NomeCliente" Placeholder="Como vamos te chamar" Change="() => cardapioPedido.SalvaInfoPedido()" Style="width: 100%;" />
         </RadzenRow>
-        <RadzenRow JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
-            <RadzenButton Text="Fazer Pedido" Click="FazerPedido" Disabled="!pedidoProdutos.Any()" />
+        <RadzenRow>
+            <RadzenLabel Text="Número do seu celular" class="label-nome-celular" Style="" />
+            <RadzenMask @bind-Value="pedido.Telefone" Mask="(**) *****-****" CharacterPattern="[0-9]" Change="() => cardapioPedido.SalvaInfoPedido()" Placeholder="(00) 00000-0000" Style="width: 100%;" />
+        </RadzenRow>
+        <RadzenRow JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Style="margin-top: 2rem">
+            <RadzenButton Text="Fazer Pedido" Click="FazerPedido" Disabled="!pedidoProdutos.Any()" Style="width: 100%" />
         </RadzenRow>
     </RadzenStack>
 </div>
@@ -101,41 +130,93 @@
     [Parameter]
     public Pedido pedido { get; set; }
 
-    public string NomeCliente { get; set; }
-
     public void RemovePedidoProduto(PedidoProduto pedidoProduto)
     {
         pedidoProdutos.Remove(pedidoProduto);
+        cardapioPedido.SalvaInfoPedido();
     }
 
     public void DiminuiQuantidade(PedidoProduto pedidoProduto)
     {
         pedidoProdutos.First(f => f.Id == pedidoProduto.Id).Quantidade--;
+        cardapioPedido.SalvaInfoPedido();
     }
 
     public void AumentaQuantidade(PedidoProduto pedidoProduto)
     {
         pedidoProdutos.First(f => f.Id == pedidoProduto.Id).Quantidade++;
+        cardapioPedido.SalvaInfoPedido();
     }
 
     public void FechaPopup()
     {
+        cardapioPedido.AtualizaTelaPedido();
         DialogService.Close();
+    }
+
+    public async void RedirecionaStatusPedido(string tel)
+    {
+        await JsRuntime.InvokeVoidAsync("abreTela", $"/StatusPedido?restauranteId={restaurante.Id}&telefone={tel}");
+    }
+
+    public async void RecarregaTela()
+    {
+        await JsRuntime.InvokeVoidAsync("recarregaTela");
     }
 
     public async Task FazerPedido()
     {
-        if (string.IsNullOrWhiteSpace(NomeCliente))
+        if (string.IsNullOrWhiteSpace(pedido.NomeCliente))
         {
             await JsRuntime.InvokeVoidAsync("notifica", "", "Preencha seu nome e sobrenome para prosseguir", false);
             return;
         }
 
-        using(var scope = scopeFactory.CreateScope())
+        var telefone = "";
+        var numeros = new List<char>() { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+
+        foreach (var t in pedido.Telefone)
         {
-            var retorno = scope.ServiceProvider.GetRequiredService<IPedidoRepository>().InserePedido(pedido, pedidoProdutos);
+            if (numeros.Contains(t))
+            {
+                telefone += t;
+            }
         }
 
-    }
+        if (telefone.Length != 11)
+        {
+            await JsRuntime.InvokeVoidAsync("notifica", "", "Preencha seu número de celular para prosseguir", false);
+            return;
+        }
 
+        using (var scope = scopeFactory.CreateScope())
+        {
+            var popupConfirma = await DialogService.Confirm($"Deseja fazer o pedido?", "Fazer Pedido", new ConfirmOptions() { OkButtonText = "Sim", CancelButtonText = "Não" });
+            if (popupConfirma == true)
+            {
+                pedido.Telefone = telefone;
+                var retorno = scope.ServiceProvider.GetRequiredService<IPedidoRepository>().InserePedido(pedido, pedidoProdutos);
+
+                if (retorno.Sucesso)
+                {
+                    pedidoProdutos.Clear();
+                    cardapioPedido.SalvaInfoPedido();
+                    await DialogService.OpenAsync($"Pedido Realizado", ds =>
+                        @<RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Style="height: 75vh;">
+                            <RadzenRow Gap="2rem" Class="rz-p-0 rz-p-lg-4">
+                                <span style=" font-size: 1rem; font-weight: 500;">Seu pedido foi realizado com sucesso!</span>
+                            </RadzenRow>
+                            <RadzenRow Gap="2rem" Class="rz-p-0 rz-p-lg-4" JustifyContent="JustifyContent.Center">
+                                <RadzenButton Variant="Variant.Outlined" Text="Fazer outro pedido" Click="RecarregaTela" Style="width: 100%" />
+                                <RadzenButton Text="Acompanhar Status do Pedido" Click="(args) => RedirecionaStatusPedido(telefone)" Style="width: 100%" />
+                            </RadzenRow>
+                        </RadzenStack>, new DialogOptions() { Width = "100vw", Height = "100vh", Resizable = false, Draggable = false, ShowClose = false });
+                }
+                else
+                {
+                    await JsRuntime.InvokeVoidAsync("notifica", "Erro", "Ocorreu um erro ao fazer o pedido", false);
+                }
+            }
+        }
+    }
 }

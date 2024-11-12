@@ -41,6 +41,7 @@
             <RadzenButton Icon="search" Text="" Click="() => MostraPopupDetalhePedido(context)" ButtonStyle="ButtonStyle.Warning" />
         </RadzenStack>
         @context.NomeCliente<br />
+        @context.TelefoneFormatado<br />
         Mesa: @context?.Mesa?.Codigo <br />
         @context.Inclusao.ToString("dd/MM/yyyy HH:mm")
     </Template>

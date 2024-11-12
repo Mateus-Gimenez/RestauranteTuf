@@ -1,9 +1,11 @@
 ﻿using GuardFood.Core.Data.Interfaces;
+using GuardFood.Core.Data.ViewModel;
 using GuardFood.Core.Entities;
 using GuardFood.Core.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using QRCoder;
 using Rotativa.AspNetCore;
 
@@ -15,12 +17,14 @@ namespace GuardFood.Client.Controllers
         private readonly UserManager<Usuario> _userManager;
         private readonly IRestauranteRepository _restauranteRepository;
         private readonly IMesaRepository _mesaRepository;
+        private readonly IPedidoRepository _pedidoRepository;
 
-        public CardapioController(UserManager<Usuario> userManager, IRestauranteRepository restauranteRepository, IMesaRepository mesaRepository)
+        public CardapioController(UserManager<Usuario> userManager, IRestauranteRepository restauranteRepository, IMesaRepository mesaRepository, IPedidoRepository pedidoRepository)
         {
             _userManager = userManager;
             _restauranteRepository = restauranteRepository;
             _mesaRepository = mesaRepository;
+            _pedidoRepository = pedidoRepository;
         }
 
         [AllowAnonymous]
@@ -40,11 +44,46 @@ namespace GuardFood.Client.Controllers
             var restaurante = _restauranteRepository.GetById(mesa.RestauranteId);
             mesa.Restaurante = restaurante;
 
-            var pedido = new Pedido() { RestauranteId = restaurante.Id, MesaId = mesa.Id };
+            var cardapio = _restauranteRepository.GetCardapio(restaurante.Id);
 
+            var pedido = new Pedido() { RestauranteId = restaurante.Id, MesaId = mesa.Id };
             var pedidoProdutos = new List<PedidoProduto>();
 
-            ViewData["Categorias"] = _restauranteRepository.GetCardapio(restaurante.Id);
+            var pedidoSalvo = Request.Cookies[$"pedido-{restaurante.Id}"];
+            if (!string.IsNullOrWhiteSpace(pedidoSalvo))
+            {
+                var pedidoInfo = new PedidoInfoViewModel();
+                JsonConvert.PopulateObject(pedidoSalvo, pedidoInfo);
+
+                pedido.NomeCliente = pedidoInfo?.Pedido?.NomeCliente;
+                pedido.Telefone = pedidoInfo?.Pedido?.Telefone;
+
+                var produtos = new List<Produto>();
+                foreach(var p in cardapio.Select(s => s.Produtos))
+                {
+                    produtos.AddRange(p);
+                }
+
+                foreach(var pp in pedidoInfo?.PedidoProdutos ?? new List<PedidoProdutoViewModel>())
+                {
+                    var produto = produtos.FirstOrDefault(f => f.Id == pp.ProdutoId);
+                    if(produto != null)
+                    {
+                        pedidoProdutos.Add(new PedidoProduto() 
+                        { 
+                            ProdutoId = pp.ProdutoId,
+                            PedidoId = pedido.Id,
+                            Quantidade = pp.Quantidade,
+                            RestauranteId = pedido.RestauranteId,
+                            NomeProduto = produto.Nome,
+                            ValorUnitario = produto.Valor,
+                            Observacao = pp.Observacao,
+                        });
+                    }
+                }
+            }
+
+            ViewData["Categorias"] = cardapio;
             ViewData["Pedido"] = pedido;
             ViewData["PedidoProdutos"] = pedidoProdutos;
 
@@ -74,6 +113,44 @@ namespace GuardFood.Client.Controllers
             };
 
             return pdf;
+        }
+
+        [HttpGet]
+        [Route("/StatusPedido")]
+        [AllowAnonymous]
+        public IActionResult StatusPedido(Guid restauranteId, string telefone)
+        {
+            var restaurante = _restauranteRepository.GetById(restauranteId);
+
+            var numeros = new List<char>() { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+            var numeroTelefone = "";
+
+            foreach (var t in telefone ?? "")
+            {
+                if (numeros.Contains(t))
+                {
+                    numeroTelefone += t;
+                }
+            }
+
+            if (numeroTelefone.Length != 11 || telefone.Length != 11)
+            {
+                return View("~/Views/StatusPedido/InserirTelefone.cshtml", restaurante);
+            }
+
+            ViewData["Pedidos"] = _pedidoRepository.GetByTelefone(restaurante.Id, telefone);
+            ViewData["Telefone"] = telefone;
+            ViewData["TelefoneFormatado"] = Convert.ToUInt64(telefone).ToString(@"(00) 00000-0000");
+
+            return View("~/Views/StatusPedido/ListaPedido.cshtml", restaurante);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("/SalvaInfoPedido")]
+        public void SalvaInfoPedido(string pedidoInfoViewModel, Guid restauranteId)
+        {
+            HttpContext.Response.Cookies.Append($"pedido-{restauranteId}", pedidoInfoViewModel);
         }
     }
 }

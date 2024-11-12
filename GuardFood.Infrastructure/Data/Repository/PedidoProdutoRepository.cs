@@ -18,5 +18,10 @@ namespace GuardFood.Core.Data.Repository
         {
             return _context.PedidoProdutos.Include(i => i.Produto).Where(w => w.Ativo && w.PedidoId == pedidoId).ToList();
         }
+
+        public IEnumerable<PedidoProduto> GetDashboard(Guid restauranteId)
+        {
+            return _context.PedidoProdutos.Include(i => i.Produto).Include(i => i.Pedido).Where(w => w.Ativo && w.RestauranteId == restauranteId).ToList();
+        }
     }
 }
