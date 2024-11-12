@@ -3,13 +3,13 @@
 @inject DialogService DialogService;
 @inject IServiceScopeFactory scopeFactory;
 
-<RadzenDataGrid Data="@produtos" Responsive="true" Style="max-height: calc(100vh - 25rem)">
+<RadzenRow JustifyContent="JustifyContent.Center">
+    <span style="color: @(pedido.CorStatus); font-weight: 700;">@(pedido.StatusDescricao)</span>
+</RadzenRow>
+
+<RadzenDataGrid Data="@produtos" Responsive="true" Style="margin-top: 1rem;max-height: calc(100vh - 25rem)">
     <Columns>
-        <RadzenDataGridColumn TItem="PedidoProduto" Property="NomeProduto" Title="Produto" Filterable="false" Sortable="false" FilterOperator="FilterOperator.StartsWith">
-            <FooterTemplate>
-                <b>@produtos.Count</b> Itens
-            </FooterTemplate>
-        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="PedidoProduto" Property="NomeProduto" Title="Produto" Filterable="false" Sortable="false" FilterOperator="FilterOperator.StartsWith" />
         <RadzenDataGridColumn TItem="PedidoProduto" Property="Quantidade" Title="Quantidade" />
         <RadzenDataGridColumn TItem="PedidoProduto" Property="ValorUnitarioFormatado" Title="Valor Unitário" />
         <RadzenDataGridColumn TItem="PedidoProduto" Property="ValorFormatado" Title="Valor">
@@ -25,7 +25,8 @@
     <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Class="rz-mt-4">
         <RadzenButton Text="Dar Andamento" ButtonStyle="ButtonStyle.Success" Visible="(pedido?.Status == Pedido.StatusPedido.Recebido && pedido?.Status != Pedido.StatusPedido.Cancelado)" Click="() => AndamentoPedido()" />
         <RadzenButton Text="Finalizar" ButtonStyle="ButtonStyle.Success" Visible="(pedido?.Status == Pedido.StatusPedido.EmAndamento && pedido?.Status != Pedido.StatusPedido.Cancelado)" Click="() => FinalizarPedido()" />
-        <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Danger" Visible="(pedido?.Status != Pedido.StatusPedido.Cancelado)" Click="() => CancelarPedido()" />
+        <RadzenButton Text="Entregar" ButtonStyle="ButtonStyle.Success" Visible="(pedido?.Status == Pedido.StatusPedido.Concluido && pedido?.Status != Pedido.StatusPedido.Cancelado)" Click="() => EntregarPedido()" />
+        <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Danger" Visible="(pedido?.Status != Pedido.StatusPedido.Entregue && pedido?.Status != Pedido.StatusPedido.Cancelado)" Click="() => CancelarPedido()" />
     </RadzenRow>
 </RadzenStack>
 
@@ -99,6 +100,25 @@
             if (retorno.Sucesso)
             {
                 await JsRuntime.InvokeVoidAsync("notifica", "", "Pedido Finalizado com sucesso", retorno.Sucesso);
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("notifica", retorno.Sucesso ? "" : "Erro", retorno.Mensagem, retorno.Sucesso);
+            }
+        }
+        DialogService.Close();
+        dataGridPedido.GetPedidos();
+    }
+
+    async Task EntregarPedido()
+    {
+        using (var scope = scopeFactory.CreateScope())
+        {
+            pedido.Status = Pedido.StatusPedido.Entregue;
+            var retorno = scope.ServiceProvider.GetRequiredService<IPedidoRepository>().InserirEditar(pedido);
+            if (retorno.Sucesso)
+            {
+                await JsRuntime.InvokeVoidAsync("notifica", "", "Pedido Entregue com sucesso", retorno.Sucesso);
             }
             else
             {

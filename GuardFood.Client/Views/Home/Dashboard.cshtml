@@ -1,5 +1,7 @@
-﻿@{
+﻿@inject Microsoft.AspNetCore.Identity.UserManager<Usuario> userManager;
+@{
     ViewData["Title"] = "Home";
+    var usuario = userManager.GetUserAsync(User).Result;
 }
 
-<component type="typeof(GuardFood.Client.Components.Home.Dashboard)" render-mode="Server" param-restaurante="ViewBag.Restaurante">
+<component type="typeof(GuardFood.Client.Components.Home.Dashboard)" render-mode="Server" param-restaurante="ViewBag.Restaurante" param-usuario="usuario">

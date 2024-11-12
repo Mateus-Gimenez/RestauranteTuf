@@ -1,10 +1,12 @@
-﻿@{
+﻿@inject Microsoft.AspNetCore.Identity.UserManager<Usuario> userManager;
+@{
     ViewData["Title"] = "Mesas";
+    var usuario = userManager.GetUserAsync(User).Result;
 }
 
-<component type="typeof(GuardFood.Client.Components.Mesa.DataGridMesa)" render-mode="Server" param-restauranteId="ViewBag.RestauranteId">
+<component type="typeof(GuardFood.Client.Components.Mesa.DataGridMesa)" render-mode="Server" param-restauranteId="ViewBag.RestauranteId" param-usuario="usuario">
 
-<script>
+    <script>
 
     function qrCode(id) {
         window.open("@(Url.Action("CardapioPDF", "Cardapio"))?Mesa=" + id);
@@ -26,4 +28,4 @@
         document.body.removeChild(textArea);
     }
 
-</script>
+    </script>

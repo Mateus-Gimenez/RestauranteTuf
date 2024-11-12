@@ -50,44 +50,51 @@
             </div>
         </RadzenColumn>
     </RadzenRow>
-    <RadzenRow>
-        <RadzenColumn Size="12" SizeMD="6">
-            <RadzenLabel><b>Vendas realizadas no ano</b></RadzenLabel>
-            <RadzenChart>
-                <RadzenColumnSeries Data="@ValorVendas" CategoryProperty="Mes" Title="2024" LineType="LineType.Dashed" ValueProperty="Valor">
-                    <RadzenSeriesDataLabels Visible="false" />
-                </RadzenColumnSeries>
-                <RadzenColumnOptions Radius="5" />
-                <RadzenValueAxis Formatter="@FormataMoeda">
-                    <RadzenGridLines Visible="true" />
-                </RadzenValueAxis>
-            </RadzenChart>
-        </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="6">
-            <RadzenLabel><b>Produtos mais pedidos no mês</b></RadzenLabel>
-            <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
-                <div>
-                    <RadzenLabel Text="Dt. Início" />
-                    <RadzenDatePicker @bind-Value=@dataInicio DateFormat="dd/MM/yyyy" Change="AtualizaGraficoProdutos" />
-                </div>
-                <div>
-                    <RadzenLabel Text="Dt. Fim" />
-                    <RadzenDatePicker @bind-Value=@dataFim DateFormat="dd/MM/yyyy" Change="AtualizaGraficoProdutos" />
-                </div>
-            </RadzenRow>
-            <RadzenChart>
-                <RadzenPieSeries Data="@QuantidadesProdutos" CategoryProperty="Nome" ValueProperty="Quantidade" Title="Quantidade">
-                    <RadzenSeriesDataLabels Visible="@false" />
-                </RadzenPieSeries>
-            </RadzenChart>
-        </RadzenColumn>
-    </RadzenRow>
+
+    @if(usuario?.Tipo == Usuario.TipoUsuario.Master)
+    {
+        <RadzenRow>
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenLabel><b>Vendas realizadas no ano</b></RadzenLabel>
+                <RadzenChart>
+                    <RadzenColumnSeries Data="@ValorVendas" CategoryProperty="Mes" Title="2024" LineType="LineType.Dashed" ValueProperty="Valor">
+                        <RadzenSeriesDataLabels Visible="false" />
+                    </RadzenColumnSeries>
+                    <RadzenColumnOptions Radius="5" />
+                    <RadzenValueAxis Formatter="@FormataMoeda">
+                        <RadzenGridLines Visible="true" />
+                    </RadzenValueAxis>
+                </RadzenChart>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenLabel><b>Produtos mais pedidos no mês</b></RadzenLabel>
+                <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
+                    <div>
+                        <RadzenLabel Text="Dt. Início" />
+                        <RadzenDatePicker @bind-Value=@dataInicio DateFormat="dd/MM/yyyy" Change="AtualizaGraficoProdutos" />
+                    </div>
+                    <div>
+                        <RadzenLabel Text="Dt. Fim" />
+                        <RadzenDatePicker @bind-Value=@dataFim DateFormat="dd/MM/yyyy" Change="AtualizaGraficoProdutos" />
+                    </div>
+                </RadzenRow>
+                <RadzenChart>
+                    <RadzenPieSeries Data="@QuantidadesProdutos" CategoryProperty="Nome" ValueProperty="Quantidade" Title="Quantidade">
+                        <RadzenSeriesDataLabels Visible="@false" />
+                    </RadzenPieSeries>
+                </RadzenChart>
+            </RadzenColumn>
+        </RadzenRow>
+    }
 </RadzenStack>
 
 @code {
 
     [Parameter]
     public Restaurante restaurante { get; set; }
+
+    [Parameter]
+    public Usuario usuario { get; set; } = null;
 
     public List<int> anoPedidos { get; set; } = new List<int>() { DateTime.Now.Year };
     public DateTime dataInicio { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);

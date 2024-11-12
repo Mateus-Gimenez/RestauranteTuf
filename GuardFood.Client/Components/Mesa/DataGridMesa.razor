@@ -34,8 +34,8 @@
                 {
                     <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="edit" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="(args => ExibePopupEditarMesa(Id))" title="Editar" />
                     <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Click="(args => DeleteMesa(Id))" class="my-1 ms-1" title="Remover" />
-                    <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="qr_code" Variant="Variant.Flat" Size="ButtonSize.Medium" title="QR Code" Click="(args => QRCode(Id))" />
                 }
+                <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="qr_code" Variant="Variant.Flat" Size="ButtonSize.Medium" title="QR Code" Click="(args => QRCode(Id))" />
                 <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="content_copy" Variant="Variant.Flat" Size="ButtonSize.Medium" title="Copiar Link" Click="(args => CopiarLink(Id))" />
             </Template>
         </RadzenDataGridColumn>

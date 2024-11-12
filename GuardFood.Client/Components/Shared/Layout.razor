@@ -71,21 +71,15 @@
     {
         <RadzenSidebar @bind-Expanded="@sidebarExpanded" Responsive="true">
             <RadzenPanelMenu>
-                @if (usuario.Tipo == Usuario.TipoUsuario.Cozinha || usuario.Tipo == Usuario.TipoUsuario.Salao)
-                {
-                    <RadzenPanelMenuItem Text="Pedidos" Icon="receipt_long" Path="/Pedido" />
-                    <RadzenPanelMenuItem Text="Mesas" Icon="table_restaurant" Path="/Mesa" />
-                }
+                <RadzenPanelMenuItem Text="Home" Icon="home" Path="/Home/Dashboard" />
+                <RadzenPanelMenuItem Text="Pedidos" Icon="receipt_long" Path="/Pedido" />
+                <RadzenPanelMenuItem Text="Mesas" Icon="table_restaurant" Path="/Mesa" />
                 @if (usuario.Tipo == Usuario.TipoUsuario.Master)
                 {
-                    <RadzenPanelMenuItem Text="Mesas" Icon="table_restaurant" Path="/Mesa" />
                     <RadzenPanelMenuItem Text="Usuários" Icon="account_box" Path="/Usuario" />
-                    <RadzenPanelMenuItem Text="Config. Restaurante" Icon="settings" Path="/Restaurante/Configuracoes" />
-                    <RadzenPanelMenuItem Text="Home" Icon="home" Path="/Home/Dashboard" />
                     <RadzenPanelMenuItem Text="Produtos" Icon="inventory_2" Path="/Produto" />
-                    <RadzenPanelMenuItem Text="Pedidos" Icon="receipt_long" Path="/Pedido" />
+                    <RadzenPanelMenuItem Text="Config. Restaurante" Icon="settings" Path="/Restaurante/Configuracoes" />
                 }
-
             </RadzenPanelMenu>
         </RadzenSidebar>
     }

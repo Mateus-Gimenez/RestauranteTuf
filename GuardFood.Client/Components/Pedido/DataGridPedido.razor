@@ -14,24 +14,24 @@
 <RadzenDropZoneContainer TItem="Pedido" Data="pedidos" ItemRender="@OnItemRender" ItemSelector="@ItemSelector" CanDrop="@CanDrop">
     <ChildContent>
         <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.NoWrap" class="rz-p-12">
-            <RadzenDropZone Value="Pedido.StatusPedido.Recebido" class="rz-display-flex rz-flex-column rz-background-color-warning-lighter rz-border-warning-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem; overflow-y: scroll; height: calc(100vh - 18rem); min-width: 15rem;">
-                <RadzenText Text="Pedido Recebido na cozinha" TextStyle="TextStyle.Subtitle2" />
+            <RadzenDropZone Value="Pedido.StatusPedido.Recebido" class="rz-display-flex rz-flex-column rz-background-color-base-400 rz-border-base-700 rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem; overflow-y: scroll; height: calc(100vh - 18rem); min-width: 15rem;">
+                <RadzenText Text="Pedido Recebido na cozinha" TextStyle="TextStyle.Subtitle2" TextAlign="TextAlign.Center" />
             </RadzenDropZone>
 
-            <RadzenDropZone Value="Pedido.StatusPedido.EmAndamento" class="rz-display-flex rz-flex-column rz-background-color-info-lighter rz-border-info-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem; overflow-y: scroll; height: calc(100vh - 18rem); min-width: 15rem; ">
-                <RadzenText Text="Pedido sendo preparado" TextStyle="TextStyle.Subtitle2" />
+            <RadzenDropZone Value="Pedido.StatusPedido.EmAndamento" class="rz-display-flex rz-flex-column rz-background-color-warning-lighter rz-border-warning-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem; overflow-y: scroll; height: calc(100vh - 18rem); min-width: 15rem; ">
+                <RadzenText Text="Pedido sendo preparado" TextStyle="TextStyle.Subtitle2" TextAlign="TextAlign.Center" />
             </RadzenDropZone>
 
-            <RadzenDropZone Value="Pedido.StatusPedido.Concluido" class="rz-display-flex rz-flex-column rz-background-color-success-lighter rz-border-success-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem; overflow-y: scroll; height: calc(100vh - 18rem); min-width: 15rem; ">
-                <RadzenText Text="Pedido Concluído" TextStyle="TextStyle.Subtitle2" />
+            <RadzenDropZone Value="Pedido.StatusPedido.Concluido" class="rz-display-flex rz-flex-column rz-background-color-info-lighter rz-border-info-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem; overflow-y: scroll; height: calc(100vh - 18rem); min-width: 15rem; ">
+                <RadzenText Text="Pedido Concluído" TextStyle="TextStyle.Subtitle2" TextAlign="TextAlign.Center" />
             </RadzenDropZone>
 
             <RadzenDropZone Value="Pedido.StatusPedido.Entregue" class="rz-display-flex rz-flex-column rz-background-color-success-lighter rz-border-success-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem; overflow-y: scroll; height: calc(100vh - 18rem); min-width: 15rem; ">
-                <RadzenText Text="Pedido Entregue" TextStyle="TextStyle.Subtitle2" />
+                <RadzenText Text="Pedido Entregue" TextStyle="TextStyle.Subtitle2" TextAlign="TextAlign.Center" />
             </RadzenDropZone>
 
             <RadzenDropZone Value="Pedido.StatusPedido.Cancelado" class="rz-display-flex rz-flex-column rz-background-color-danger-lighter rz-border-danger-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem; overflow-y: scroll; height: calc(100vh - 18rem); min-width: 15rem; ">
-                <RadzenText Text="Pedido Cancelado" TextStyle="TextStyle.Subtitle2" />
+                <RadzenText Text="Pedido Cancelado" TextStyle="TextStyle.Subtitle2" TextAlign="TextAlign.Center" />
             </RadzenDropZone>
         </RadzenStack>
     </ChildContent>
@@ -77,6 +77,7 @@
         {
             pedidos = scope.ServiceProvider.GetRequiredService<IPedidoRepository>().BuscarTodosPorRestauranteId(restauranteId, new[] { "Mesa" }).ToList();
         }
+        StateHasChanged();
     }
 
     protected override void OnInitialized()

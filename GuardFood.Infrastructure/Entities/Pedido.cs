@@ -26,15 +26,15 @@ namespace GuardFood.Core.Entities
 
         public enum StatusPedido
         {
-            [Description("Recebido")]
+            [Description("Pedido Recebido na Cozinha")]
             Recebido = 0,
-            [Description("Em Andamento")]
+            [Description("Pedido sendo Preparado")]
             EmAndamento = 1,
-            [Description("Conclúído")]
+            [Description("Pedido Concluído")]
             Concluido = 2,
-            [Description("Cancelado")]
+            [Description("Pedido Cancelado")]
             Cancelado = 3,
-            [Description("Entregue")]
+            [Description("Pedido Entregue")]
             Entregue = 4,
         }
 
