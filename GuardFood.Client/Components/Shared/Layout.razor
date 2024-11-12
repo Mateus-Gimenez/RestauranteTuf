@@ -71,10 +71,10 @@
     {
         <RadzenSidebar @bind-Expanded="@sidebarExpanded" Responsive="true">
             <RadzenPanelMenu>
-                @if(usuario.Tipo == Usuario.TipoUsuario.Funcionario)
+                @if (usuario.Tipo == Usuario.TipoUsuario.Cozinha || usuario.Tipo == Usuario.TipoUsuario.Salao)
                 {
-                    <RadzenPanelMenuItem Text="Produtos" Icon="inventory_2" Path="/Produto" />
                     <RadzenPanelMenuItem Text="Pedidos" Icon="receipt_long" Path="/Pedido" />
+                    <RadzenPanelMenuItem Text="Mesas" Icon="table_restaurant" Path="/Mesa" />
                 }
                 @if (usuario.Tipo == Usuario.TipoUsuario.Master)
                 {

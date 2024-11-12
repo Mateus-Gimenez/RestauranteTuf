@@ -51,7 +51,7 @@
         using (var scope = ScopeFactory.CreateScope())
         {
             objeto.RestauranteId = objeto.RestauranteId == Guid.Empty ? restauranteId : objeto.RestauranteId;
-            objeto.Tipo = Usuario.TipoUsuario.Funcionario;
+            objeto.Tipo = Usuario.TipoUsuario.Cozinha;
 
             var retorno = new RetornoViewModel();
 

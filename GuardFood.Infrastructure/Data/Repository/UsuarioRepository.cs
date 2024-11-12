@@ -32,7 +32,7 @@ namespace GuardFood.Core.Data.Repository
 
         public IEnumerable<Usuario> GetFuncionariosByRestauranteId(Guid restauranteId)
         {
-            return _dbContext.Usuarios.Where(u => u.Ativo && u.RestauranteId == restauranteId && u.Tipo == Usuario.TipoUsuario.Funcionario).ToList();
+            return _dbContext.Usuarios.Where(u => u.Ativo && u.RestauranteId == restauranteId && (u.Tipo == Usuario.TipoUsuario.Cozinha || u.Tipo == Usuario.TipoUsuario.Salao)).ToList();
         }
 
         public Usuario GetById(string id)

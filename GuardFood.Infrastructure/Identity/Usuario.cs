@@ -25,7 +25,8 @@ namespace GuardFood.Core.Identity
         public enum TipoUsuario
         {
             Master = 0,
-            Funcionario = 1,
+            Cozinha = 1,
+            Salao = 2,
         }
     }
 }

@@ -3,6 +3,7 @@
 @inject DialogService DialogService;
 @inject IServiceScopeFactory scopeFactory;
 
+
 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
     <RadzenLabel><h4>Mesas</h4></RadzenLabel>
     <RadzenBreadCrumb>
@@ -12,9 +13,14 @@
 </RadzenStack>
 
 <RadzenDataGrid Data="@mesas" @ref="gridMesa" LoadData="@LoadDataMesa" Responsive="true">
+
     <HeaderTemplate>
-        <RadzenButton Text="+ Mesa" Click=@(() => ExibePopupMesa()) />
+        @if (usuario?.Tipo == Usuario.TipoUsuario.Master)
+        {
+            <RadzenButton Text="+ Mesa" Click=@(() => ExibePopupMesa()) />
+        }
     </HeaderTemplate>
+
     <Columns>
         <RadzenDataGridColumn TItem="Mesa" Property="Codigo" Title="Código" Filterable="false" Sortable="false" FilterOperator="FilterOperator.StartsWith">
             <FooterTemplate>
@@ -24,10 +30,13 @@
         <RadzenDataGridColumn TItem="Mesa" Property="Inclusao" Title="Dt. Inclusão" />
         <RadzenDataGridColumn TItem="Mesa" Context="Id" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
             <Template Context="Id">
-                <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="edit" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="(args => ExibePopupEditarMesa(Id))" title="Editar" />
-                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Click="(args => DeleteMesa(Id))" class="my-1 ms-1" title="Remover" />
+                @if (usuario?.Tipo == Usuario.TipoUsuario.Master)
+                {
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="edit" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="(args => ExibePopupEditarMesa(Id))" title="Editar" />
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Click="(args => DeleteMesa(Id))" class="my-1 ms-1" title="Remover" />
+                    <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="qr_code" Variant="Variant.Flat" Size="ButtonSize.Medium" title="QR Code" Click="(args => QRCode(Id))" />
+                }
                 <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="content_copy" Variant="Variant.Flat" Size="ButtonSize.Medium" title="Copiar Link" Click="(args => CopiarLink(Id))" />
-                <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="qr_code" Variant="Variant.Flat" Size="ButtonSize.Medium" title="QR Code" Click="(args => QRCode(Id))" />
             </Template>
         </RadzenDataGridColumn>
 
@@ -38,6 +47,9 @@
 
     [Parameter]
     public Guid restauranteId { get; set; }
+
+    [Parameter]
+    public Usuario usuario { get; set; } = null;
 
     // Produto
     RadzenDataGrid<Mesa> gridMesa;
