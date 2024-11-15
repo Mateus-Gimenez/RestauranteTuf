@@ -52,6 +52,9 @@
     [Parameter]
     public Guid restauranteId { get; set; }
 
+    [Parameter]
+    public Usuario usuario { get; set; }
+
     IList<Pedido> pedidos = new List<Pedido>();
 
     Func<Pedido, RadzenDropZone<Pedido>, bool> ItemSelector = (item, zone) => item.Status == (Pedido.StatusPedido)zone.Value;
@@ -68,7 +71,7 @@
 
     async Task MostraPopupDetalhePedido(Pedido pedido)
     {
-        await DialogService.OpenAsync<PopupPedido>($"Pedido #{pedido.CodigoFormatado}", new Dictionary<string, object>() { { "dataGridPedido", this }, { "pedido", pedido } }, new DialogOptions() { Width = "900px", Height = "auto", Resizable = false, Draggable = true });
+        await DialogService.OpenAsync<PopupPedido>($"Pedido #{pedido.CodigoFormatado}", new Dictionary<string, object>() { { "dataGridPedido", this }, { "pedido", pedido }, { "usuario", usuario } }, new DialogOptions() { Width = "900px", Height = "auto", Resizable = false, Draggable = true });
     }
 
     public void GetPedidos()
@@ -82,39 +85,6 @@
 
     protected override void OnInitialized()
     {
-        using (var scope = scopeFactory.CreateScope())
-        {
-
-            //var mesas = scope.ServiceProvider.GetRequiredService<IMesaRepository>().BuscarTodosPorRestauranteId(restauranteId);
-            //var produtos = scope.ServiceProvider.GetRequiredService<IProdutoRepository>().BuscarTodosPorRestauranteId(restauranteId);
-            //foreach (var m in mesas)
-            //{
-            //    var pedido = new Pedido()
-            //    {
-            //        RestauranteId = restauranteId,
-            //        NomeCliente = "Cliente Teste",
-            //        MesaId = m.Id,
-            //    };
-
-            //    scope.ServiceProvider.GetRequiredService<IPedidoRepository>().InserirEditar(pedido);
-
-            //    foreach (var p in produtos)
-            //    {
-            //        var pedidoProduto = new PedidoProduto()
-            //        {
-            //            NomeProduto = p.Nome,
-            //            PedidoId = pedido.Id,
-            //            ValorUnitario = p.Valor,
-            //            Quantidade = new Random().Next(10),
-            //            ProdutoId = p.Id,
-            //            Observacao = "Sem sal",
-            //            RestauranteId = pedido.RestauranteId,
-            //        };
-            //        scope.ServiceProvider.GetRequiredService<IPedidoProdutoRepository>().InserirEditar(pedidoProduto);
-            //    }
-            //}
-        }
-
         GetPedidos();
     }
 

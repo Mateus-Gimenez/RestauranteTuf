@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -22,10 +23,22 @@ namespace GuardFood.Core.Identity
         public Guid RestauranteId { get; set; }
         public virtual Restaurante Restaurante { get; set; }
 
+        [NotMapped]
+        public string TipoDescricao
+        {
+            get
+            {
+                return Common.GetEnumDescription(Tipo);
+            }
+        }
+
         public enum TipoUsuario
         {
+            [Description("Master")]
             Master = 0,
+            [Description("Cozinha")]
             Cozinha = 1,
+            [Description("Salão")]
             Salao = 2,
         }
     }

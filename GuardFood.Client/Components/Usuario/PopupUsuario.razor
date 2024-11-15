@@ -17,6 +17,31 @@
                     <RadzenRequiredValidator Component="Email" Text="E-mail é obrigatório" Popup="true" Style="position: absolute" />
                 </ChildContent>
             </RadzenFormField>
+            <RadzenFormField Text="Função" Variant="Variant.Outlined">
+                <ChildContent>
+                    <RadzenDropDown Name="Funcao" @bind-Value="@objeto.Tipo" Data="@ListaFuncoes" TextProperty="@nameof(ListaFuncao.DescricaoTipo)" ValueProperty="@nameof(ListaFuncao.Tipo)" AutoCompleteType="AutoCompleteType.Off" />
+                    <RadzenRequiredValidator Component="Funcao" Text="Função é obrigatório" Popup="true" Style="position: absolute" />
+                </ChildContent>
+            </RadzenFormField>
+
+            @if (!editar)
+            {
+                <RadzenFormField Text="Senha Inicial" Variant="Variant.Outlined">
+                    <ChildContent>
+                        <RadzenPassword Name="Senha" @bind-Value="@senha" AutoCompleteType="AutoCompleteType.Off" />
+                        <RadzenRequiredValidator Component="Senha" Text="Senha Inicial é obrigatória" Popup="true" Style="position: absolute" />
+                    </ChildContent>
+                </RadzenFormField>
+
+                <RadzenFormField Text="Confirmar Senha Inicial" Variant="Variant.Outlined">
+                    <ChildContent>
+                        <RadzenPassword Name="ConfirmaSenha" @bind-Value="@confirmaSenha" />
+                        <RadzenRequiredValidator Component="ConfirmaSenha" Text="Confirmar Senha é obrigatório" Popup="true" Style="position: absolute" />
+                        <RadzenCompareValidator Value=@senha Component="ConfirmaSenha" Text="As senhas devem ser iguais" Popup=true Style="position: absolute" />
+                    </ChildContent>
+                </RadzenFormField>
+            }
+
             <RadzenRow AlignItems="AlignItems.Center" Class="rz-mt-4">
                 <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
                     <RadzenButton ButtonType="ButtonType.Submit" Text="@(editar ? "Editar" : "Adicionar")"></RadzenButton>
@@ -36,10 +61,27 @@
     public DataGridUsuario dataGridUsuario { get; set; }
 
     [Parameter]
-    public Usuario objeto { get; set; } = new Usuario();
+    public Usuario objeto { get; set; } = new Usuario() { Tipo = Usuario.TipoUsuario.Cozinha };
 
     [Parameter]
     public bool editar { get; set; } = false;
+
+    public string senha { get; set; }
+
+    public string confirmaSenha { get; set; }
+
+    public List<ListaFuncao> ListaFuncoes = new List<ListaFuncao>()
+    {
+        new ListaFuncao() { Tipo = Usuario.TipoUsuario.Cozinha, DescricaoTipo = Common.GetEnumDescription(Usuario.TipoUsuario.Cozinha) },
+        new ListaFuncao() { Tipo = Usuario.TipoUsuario.Salao, DescricaoTipo = Common.GetEnumDescription(Usuario.TipoUsuario.Salao) },
+    };
+
+    public class ListaFuncao
+    {
+        public string DescricaoTipo { get; set; }
+        public Usuario.TipoUsuario Tipo { get; set; }
+    }
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -51,20 +93,20 @@
         using (var scope = ScopeFactory.CreateScope())
         {
             objeto.RestauranteId = objeto.RestauranteId == Guid.Empty ? restauranteId : objeto.RestauranteId;
-            objeto.Tipo = Usuario.TipoUsuario.Cozinha;
+            objeto.UserName = objeto.Email;
 
             var retorno = new RetornoViewModel();
 
             if (!editar)
             {
-                var result = await scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<Usuario>>().CreateAsync(objeto, "");
+                var result = await scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<Usuario>>().CreateAsync(objeto, senha);
                 if (result.Succeeded)
                 {
                     retorno = new RetornoViewModel() { Sucesso = true, Mensagem = "Funcionário inserido com sucesso" };
                 }
                 else
                 {
-                    retorno = new RetornoViewModel() { Sucesso = false, Mensagem = string.Join(", ", result.Errors) };
+                    retorno = new RetornoViewModel() { Sucesso = false, Mensagem = string.Join(", ", result.Errors?.Select(s => s.Description)) };
                 }
             }
             else

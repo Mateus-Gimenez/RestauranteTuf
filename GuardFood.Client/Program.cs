@@ -20,7 +20,12 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContextFactory<GFContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<Usuario>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<GFContext>();
+builder.Services.AddDefaultIdentity<Usuario>(options =>
+{ 
+    options.SignIn.RequireConfirmedAccount = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+}).AddEntityFrameworkStores<GFContext>();
 
 builder.Services.AddAuthenticationCore();
 builder.Services.AddSession(options =>

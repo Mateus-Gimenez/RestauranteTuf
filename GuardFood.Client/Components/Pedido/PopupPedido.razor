@@ -23,9 +23,9 @@
 
 <RadzenStack>
     <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Class="rz-mt-4">
-        <RadzenButton Text="Dar Andamento" ButtonStyle="ButtonStyle.Success" Visible="(pedido?.Status == Pedido.StatusPedido.Recebido && pedido?.Status != Pedido.StatusPedido.Cancelado)" Click="() => AndamentoPedido()" />
-        <RadzenButton Text="Finalizar" ButtonStyle="ButtonStyle.Success" Visible="(pedido?.Status == Pedido.StatusPedido.EmAndamento && pedido?.Status != Pedido.StatusPedido.Cancelado)" Click="() => FinalizarPedido()" />
-        <RadzenButton Text="Entregar" ButtonStyle="ButtonStyle.Success" Visible="(pedido?.Status == Pedido.StatusPedido.Concluido && pedido?.Status != Pedido.StatusPedido.Cancelado)" Click="() => EntregarPedido()" />
+        <RadzenButton Text="Dar Andamento" ButtonStyle="ButtonStyle.Success" Visible="(pedido?.Status == Pedido.StatusPedido.Recebido && pedido?.Status != Pedido.StatusPedido.Cancelado) && (usuario.Tipo == Usuario.TipoUsuario.Master || usuario.Tipo == Usuario.TipoUsuario.Cozinha)" Click="() => AndamentoPedido()" />
+        <RadzenButton Text="Finalizar" ButtonStyle="ButtonStyle.Success" Visible="(pedido?.Status == Pedido.StatusPedido.EmAndamento && pedido?.Status != Pedido.StatusPedido.Cancelado) && (usuario.Tipo == Usuario.TipoUsuario.Master || usuario.Tipo == Usuario.TipoUsuario.Cozinha)" Click="() => FinalizarPedido()" />
+        <RadzenButton Text="Entregar" ButtonStyle="ButtonStyle.Success" Visible="(pedido?.Status == Pedido.StatusPedido.Concluido && pedido?.Status != Pedido.StatusPedido.Cancelado) && (usuario.Tipo == Usuario.TipoUsuario.Master || usuario.Tipo == Usuario.TipoUsuario.Salao)" Click="() => EntregarPedido()" />
         <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Danger" Visible="(pedido?.Status != Pedido.StatusPedido.Entregue && pedido?.Status != Pedido.StatusPedido.Cancelado)" Click="() => CancelarPedido()" />
     </RadzenRow>
 </RadzenStack>
@@ -34,6 +34,9 @@
 
     [Parameter]
     public Pedido pedido { get; set; }
+
+    [Parameter]
+    public Usuario usuario { get; set; }
 
     [Parameter]
     public DataGridPedido dataGridPedido { get; set; }
